@@ -9,9 +9,30 @@ class Users(db.Model):
     email = db.Column(db.String(), nullable = False, unique = True)
     password_hash = db.Column(db.String(), nullable = False) 
     role = db.Column(db.String(), nullable = False)
+
+# class Project(db.Model):
+
+# class Milestones(db.Model):
+
+# StudentTAChat(db.Model):
+
+# class MentorshipSessions(db.Model):
+
+# class AIChatbot(db.Model):
+
+# class ChatbotInteractions(db.Model):
+
+# class Feedback(db.Model):
+
+# class StudentDoubts(db.Model):
+
+# class VivaSlots(db.Model):
+
+# class Alerts(db.Model):
+
     
 '''
 - could add github profile link to users table
 
-project (GitHub link as one of the attributes), mentorship sessions, milestones, student doubts(for TA), feedback on project, viva slots, AI (need to figure out exact config),   
+  
 '''
