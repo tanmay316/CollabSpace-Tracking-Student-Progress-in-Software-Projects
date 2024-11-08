@@ -1,13 +1,13 @@
 <template>
     <div class="container">
-      <div class="header"><h2>SWE: Project</h2></div>
+      <div class="header"><h2>Software Engineering Project</h2></div>
       <div class="content">
         <div class="grid">
 
           <div class="project-card">
             <div class="card-header">
               <h3>
-                <RouterLink to="/milestone">
+                <RouterLink to="/milestones">
                   <a
                   href=""
                   target="_blank"
