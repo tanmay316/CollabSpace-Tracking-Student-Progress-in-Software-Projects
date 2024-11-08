@@ -34,9 +34,9 @@ const router = createRouter({
       component: () => import('../views/ChatUsersView.vue')
     },
     {
-      path:'/chatInterface',
+      path:'/ta-chat',
       name:'chatInterface',
-      component: () => import('../views/chatInterfaceView.vue')
+      component: () => import('../views/ChatInterfaceView.vue')
     }
   ]
 })

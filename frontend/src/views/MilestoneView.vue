@@ -1,5 +1,5 @@
 <script setup>
-import Milestone from '../components/Milestone.vue';
+import Milestone from '../components/Milestones.vue';
 </script>
 
 <template>

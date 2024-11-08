@@ -8,22 +8,10 @@
             <div class="card-header">
               <h3>
                 <RouterLink to="/milestones">
-                  <a
-                  href=""
-                  target="_blank"
-                  rel="noreferrer"
-                  >
-                  Milestones
-                </a>
+                  <a href="" target="_blank" rel="noreferrer">Milestones</a>
               </RouterLink>
               </h3>
-              <a class="badge"
-                href="https://github.com/anigaut/soft-engg-project-sep-2024-se-sep-10"
-                target="_blank"
-                rel="noreferrer"
-              >
-              GitHub
-            </a>
+              <a class="badge" href="https://github.com/anigaut/soft-engg-project-sep-2024-se-sep-10" target="_blank" rel="noreferrer">GitHub</a>
             </div>
             <div class="card-body">
               <div>
@@ -52,25 +40,35 @@
           <div class="project-card">
             <div class="card-header">
               <h3>
-                <RouterLink to="/milestone">
+                <RouterLink to="mentorship">
+                  <a href="" target="_blank" rel="noreferrer">Mentorship Sessions</a>
+              </RouterLink>
+            </h3>
+            </div>
+            <div class="card-body">
+              <div>
+                <p>Get mentorship from industry experts to learn frameworks and libraries for this project and beyond!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="card-header">
+              <h3>
+                <RouterLink to="/ta-chat">
                   <a
                   href=""
                   target="_blank"
                   rel="noreferrer"
                   >
-                  Deadlines
+                  Chat with TA
                 </a>
               </RouterLink>
             </h3>
             </div>
             <div class="card-body">
               <div>
-                <div class="milestones">1</div>
-                <div class="milestones">2</div>
-                <div class="milestones">3</div>
-                <div class="milestones">4</div>
-                <div class="milestones">5</div>
-                <div class="milestones">6</div>
+                <p>TAs available to clear doubts: John Doe, Jane Doe</p>
               </div>
             </div>
           </div>
@@ -81,18 +79,10 @@
             <div class="card-header">
               <h3>
                 <RouterLink to="/milestone">
-                  <a
-                  href=""
-                  target="_blank"
-                  rel="noreferrer"
-                  >
-                  Viva Slots
-                </a>
-              </RouterLink>
+                  <a href="" target="_blank" rel="noreferrer">Viva Slots</a>
+                </RouterLink>
               </h3>
-              <span class="badge">
-              Open
-              </span>
+              <span class="badge">Open</span>
             </div>
             <div class="card-body">
               <div class="slots">
