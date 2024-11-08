@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-button"><RouterLink to="/chatInterface">Ai</RouterLink></div>
+  <div class="ai-button"><RouterLink to="/ta-chat">AI</RouterLink></div>
 </template>
 
 <style scoped>

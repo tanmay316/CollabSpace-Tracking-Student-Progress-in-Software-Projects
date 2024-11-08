@@ -32,31 +32,31 @@
   const milestones = [
     {
       id: 0,
-      title: '+ Milestone',
+      title: 'Milestone 1',
       description: 'CRUD Operations.',
       status: 'pending'
     },
     {
       id: 1,
-      title: 'Initial Project Setup',
+      title: 'Milestone 2',
       description: 'Setting up the project repository and structure.',
       status: 'completed'
     },
     {
       id: 2,
-      title: 'Frontend Development',
+      title: 'Milestone 3',
       description: 'Implementing the user interface and frontend logic.',
       status: 'incomplete'
     },
     {
       id: 3,
-      title: 'Backend API Integration',
+      title: 'Milestone 4',
       description: 'Integrating the backend APIs with the frontend.',
       status: 'pending'
     },
     {
       id: 4,
-      title: 'Testing and Deployment',
+      title: 'Milestone 5',
       description: 'Running tests and deploying the project.',
       status: 'pending'
     }
