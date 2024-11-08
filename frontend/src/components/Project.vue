@@ -51,28 +51,6 @@
               </div>
             </div>
           </div>
-
-          <div class="project-card">
-            <div class="card-header">
-              <h3>
-                <RouterLink to="/ta-chat">
-                  <a
-                  href=""
-                  target="_blank"
-                  rel="noreferrer"
-                  >
-                  Chat with TA
-                </a>
-              </RouterLink>
-            </h3>
-            </div>
-            <div class="card-body">
-              <div>
-                <p>TAs available to clear doubts: John Doe, Jane Doe</p>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <div class="project-card">
