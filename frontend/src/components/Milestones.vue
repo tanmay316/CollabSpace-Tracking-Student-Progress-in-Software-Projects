@@ -2,6 +2,7 @@
     <div class="container">
       <div class="header">Milestones</div>
       <div class="content">
+        <RouterLink to='/submission'>
         <div class="grid">
           <div 
             v-for="milestone in milestones" 
@@ -24,6 +25,7 @@
             </div>
           </div>
         </div>
+      </RouterLink>
       </div>
     </div>
   </template>
@@ -85,9 +87,11 @@
   .header {
     text-align: center;
     font-size: 1.5rem;
-    color: #000;
     padding-bottom: 48px;
-    padding-top: 32px;
+    padding-top: 4rem;
+    color: gray;
+    font-weight: bold;
+    margin-bottom: 1rem;
   }
   
   .content {
