@@ -40,7 +40,7 @@
           <div class="project-card">
             <div class="card-header">
               <h3>
-                <RouterLink to="mentorship">
+                <RouterLink to="/mentorship">
                   <a href="" target="_blank" rel="noreferrer">Mentorship Sessions</a>
               </RouterLink>
             </h3>
@@ -56,9 +56,7 @@
         <div class="project-card">
             <div class="card-header">
               <h3>
-                <RouterLink to="/milestone">
-                  <a href="" target="_blank" rel="noreferrer">Viva Slots</a>
-                </RouterLink>
+                Viva Slots
               </h3>
               <span class="badge">Open</span>
             </div>

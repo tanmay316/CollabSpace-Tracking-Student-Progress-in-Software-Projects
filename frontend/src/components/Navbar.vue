@@ -6,7 +6,7 @@
       <div class="navbar-right">
         <RouterLink to="/login" class="nav-item">Login</RouterLink>
         <RouterLink to="/register" class="nav-item">Register</RouterLink>
-        <a href="#" class="nav-item">Logout</a>
+        <RouterLink to="/" class="nav-item">Logout</RouterLink>
         <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
         <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink> 
       </div>

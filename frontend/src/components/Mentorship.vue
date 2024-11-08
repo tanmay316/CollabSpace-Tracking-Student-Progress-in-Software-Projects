@@ -3,19 +3,19 @@
         <div class="mentorship-session">
             <img src="https://via.placeholder.com/100" alt="Mentor Image" class="mentor-image" />
             <div class="session-details">
-            <h3 class="session-title">Mentorship Session Title</h3>
+            <h3 class="session-title">Mentorship Course 1</h3>
             <p class="mentor-name">Anurag</p>
             <p class="session-description">
                 This is a detailed description of the mentorship session, covering the topics that will be addressed.
             </p>
-            <p class="session-amount">$150</p>
+            <p class="session-amount">$008</p>
             </div>
         </div>
         <div class="mentorship-session">
             <img src="https://via.placeholder.com/100" alt="Mentor Image" class="mentor-image" />
             <div class="session-details">
-            <h3 class="session-title">Mentorship Session Title</h3>
-            <p class="mentor-name">Anurag</p>
+            <h3 class="session-title">Mentorship Course 2</h3>
+            <p class="mentor-name">Mentor</p>
             <p class="session-description">
                 This is a detailed description of the mentorship session, covering the topics that will be addressed.
             </p>
