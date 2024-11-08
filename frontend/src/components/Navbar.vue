@@ -7,8 +7,8 @@
         <RouterLink to="/login" class="nav-item">Login</RouterLink>
         <RouterLink to="/register" class="nav-item">Register</RouterLink>
         <a href="#" class="nav-item">Logout</a>
-        <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink>
-        <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink> -->
+        <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
+        <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink> 
       </div>
     </nav>
   </template>
