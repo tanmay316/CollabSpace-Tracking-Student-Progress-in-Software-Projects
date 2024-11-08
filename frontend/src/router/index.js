@@ -24,6 +24,11 @@ const router = createRouter({
       component: () => import('../views/MilestoneView.vue')
     },
     {
+      path:'/submission',
+      name:'submission',
+      component: () => import('../views/MilestoneSubmissionFeedbackView.vue')
+    },
+    {
       path:'/mentorship',
       name:'mentorship',
       component: () => import('../views/MentorshipView.vue')
@@ -34,7 +39,7 @@ const router = createRouter({
       component: () => import('../views/ChatUsersView.vue')
     },
     {
-      path:'/ta-chat',
+      path:'/chatInterface',
       name:'chatInterface',
       component: () => import('../views/ChatInterfaceView.vue')
     }
