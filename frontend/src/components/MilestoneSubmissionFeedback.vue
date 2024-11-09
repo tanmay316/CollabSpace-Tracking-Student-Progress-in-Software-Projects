@@ -16,6 +16,14 @@
           <div class="feedback-section">
             <input 
               v-model="submission.feedback" 
+              placeholder="Enter submission link." 
+              class="link-input"
+            />
+            <button @click="sendFeedback(submission.id)">Submission Link</button>
+          </div>
+          <div class="feedback-section">
+            <input 
+              v-model="submission.feedback" 
               placeholder="Enter feedback..." 
               class="feedback-input"
             />
@@ -150,6 +158,13 @@ h3{
 }
 
 .feedback-input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+}
+
+.link-input {
   flex: 1;
   padding: 8px;
   border-radius: 4px;

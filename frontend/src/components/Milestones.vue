@@ -2,8 +2,20 @@
     <div class="container">
       <div class="header">Milestones</div>
       <div class="content">
+        <div class="create-container">
+            <div class="card-header">
+              <h3>Title: </h3>
+              <input type="text">
+            </div>
+            <div class="card-body">
+              <p>Description: </p>
+              <input type="text">
+            </div>
+            <div class="create-milestone">+ Milestone</div>
+          </div>
         <RouterLink to='/submission'>
         <div class="grid">
+
           <div 
             v-for="milestone in milestones" 
             :key="milestone.id" 
@@ -16,12 +28,19 @@
           >
             <div class="card-header">
               <h3>{{ milestone.title }}</h3>
-              <span :class="statusClass(milestone.status)">
-                {{ milestone.status }}
-              </span>
+              <div class="stats">
+                <span :class="statusClass(milestone.status)">
+                  {{ milestone.status }}
+                </span>
+                <div class="mile-icon">❌</div>
+              </div>
             </div>
             <div class="card-body">
               <p>{{ milestone.description }}</p>
+            </div>
+            <div class="edit-body">
+              <input type="text">
+              <div class="mile-icon">✏️</div>
             </div>
           </div>
         </div>
@@ -79,9 +98,53 @@
   </script>
   
   <style scoped>
+  .stats{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .edit-body{
+    gap: 0.5rem;
+    display: flex;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .mile-icon{
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .create-milestone{
+    color: #000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: fit-content;
+    margin: 1rem;
+    padding: 0.5rem;
+  }
+
+  .create-milestone:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+    background-color: #06b6d4;
+  }
+
   .container {
     background-color: #f3f4f6;
     padding: 24px;
+  }
+
+  .create-container{
+    max-width: 70vh;
+    padding: 0.5rem;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border-left: 8px solid #06b6d4;
   }
   
   .header {
@@ -126,7 +189,8 @@
   .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    gap:0.5rem;
     padding: 16px;
     border-bottom: 1px solid #e5e7eb;
   }
