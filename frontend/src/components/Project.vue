@@ -62,12 +62,27 @@
             </div>
             <div class="card-body">
               <div class="slots">
-                <div class="slot">Slot No. 1</div>
-                <div class="slot">Slot No. 2</div>
-                <div class="slot">Slot No. 3</div>
-                <div class="slot">Slot No. 4</div>
-                <div class="slot">Slot No. 5</div>
-                <div class="slot">Slot No. 6</div>
+
+                <div class="slot-container">
+                  <div class="slot-block1">
+                    <div class="create-slot">+ Viva Slot</div>
+                  </div>
+                  <div class="slot-block2">
+                    <input class="viva-date-icon" type="date">
+                    <div class="viva-icon">🧸</div>
+                  </div>
+                </div>
+
+                <div class="slot-container">
+                  <div class="slot-block1">
+                    <div class="slot">14 / 11 / 2024</div>
+                    <div class="viva-icon">❌</div>
+                  </div>
+                  <div class="slot-block2">
+                    <input class="viva-date-icon" type="date">
+                    <div class="viva-icon">✏️</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -77,6 +92,21 @@
   </template>
   
   <style scoped>
+  .slot-block1, .slot-block2{
+    gap: 0.5rem;
+    display: flex;
+    padding: 0.5rem;
+    justify-content: space-between;
+  }
+
+  .slot-container{
+    padding: 0.5rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
   h2 {
   color: gray;
   font-weight: bold;
@@ -91,12 +121,38 @@
   }
   
   .slot{
+    align-content: center;
     color: #000;
-    display: flex;
-    padding: 0.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    margin:0 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .create-slot{
+    color: #000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .create-slot:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+    background-color: #06b6d4;
+  }
+
+  .viva-date-icon{
+    padding: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .viva-icon{
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .viva-icon:hover{
+    cursor: pointer;
   }
   
   .slot:hover{
