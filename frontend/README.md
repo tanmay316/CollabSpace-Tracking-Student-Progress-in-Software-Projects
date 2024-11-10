@@ -1,29 +1,6 @@
-# collabspace-frontend
+# Collabspace - Frontend Folder
 
-This template should help get you started developing with Vue 3 in Vite.
+This directory contains the Vue project for the Software Engineering project. To run it locally, please open the directory in the terminal and run `npm install` to get all dependencies.
 
-## Recommended IDE Setup
+After that, run `npm run dev` and open the app in a browser (it will probably use port 5173)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
