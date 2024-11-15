@@ -18,3 +18,4 @@ def get_project_status(student_id):
         })
     
     return jsonify(milestone_progress=status_data)
+  

@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Database config
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///LMS_v2_DB.sqlite3"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///collabspace_db.sqlite3"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.app_context().push()
 db.init_app(app)
@@ -34,7 +34,7 @@ app.register_blueprint(instructor, url_prefix="/api")
 app.register_blueprint(ta, url_prefix="/api")
 app.register_blueprint(admin, url_prefix="/api")
 
-# JWT intializing for authentication
+# JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
 jwt = JWTManager(app)
 
