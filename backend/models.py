@@ -2,37 +2,81 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class Users(db.Model):
-    id = db.Column(db.Integer(), primary_key = True)
-    first_name = db.Column(db.String(), nullable = False)
+    id = db.Column(db.Integer(), primary_key=True)
+    first_name = db.Column(db.String(), nullable=False)
     last_name = db.Column(db.String())
-    email = db.Column(db.String(), nullable = False, unique = True)
-    password_hash = db.Column(db.String(), nullable = False) 
-    role = db.Column(db.String(), nullable = False)
+    email = db.Column(db.String(), nullable=False, unique=True)
+    password_hash = db.Column(db.String(), nullable=False)
+    role = db.Column(db.String(), nullable=False)
 
-# class Project(db.Model):
 
-# class Milestones(db.Model):
+class Milestones(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    title = db.Column(db.String(), nullable=False)
+    description = db.Column(db.String(), nullable=False)
+    date_issued = db.Column(db.Date(), nullable=False)
+    deadline = db.Column(db.Date(), nullable=False)
+    submissions = db.relationship('MilestoneSubmissions')
 
-# StudentTAChat(db.Model):
 
-# class MentorshipSessions(db.Model):
+class MilestoneSubmissions(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    milestone_id = db.Column(db.Integer(), db.ForeignKey('milestones.id'), nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    github_branch_link = db.Column(db.String(), nullable=False)
+    # needs to be a link - use frontend validation to ensure this
 
-# class AIChatbot(db.Model):
+    marks = db.Column(db.Integer(), nullable=False)
+    instructor_feedback = db.Column(db.String(), nullable=True, default="No feedback required")
+    # can discuss if feedback should be compulsory
 
-# class ChatbotInteractions(db.Model):
+    evaluating_instructor_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    # ID of the instructor giving feedback
 
-# class Feedback(db.Model):
 
-# class StudentDoubts(db.Model):
+# class InstructorFeedback(db.Model):
+#     id = db.Column(db.Integer(), primary_key=True)
+#     instructor_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+#     student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+#     milestone_id = db.Column(db.Integer(), db.ForeignKey('milestones.id'), nullable=False)
+#     submission_id = db.Column(db.Integer(), db.ForeignKey('MilestoneSubmissions.id'), nullable=False)
+#     feedback = db.Column(db.String(), nullable=False)
 
-# class VivaSlots(db.Model):
 
-# class Alerts(db.Model):
+class MentorshipSessions(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    description = db.Column(db.String(), nullable=False)
+    price = db.Column(db.Integer(), default=200, nullable=True)
+    mentor_name = db.Column(db.String(), nullable=False)
+    registrations = db.relationship('MentorshipRegistrations')
 
-    
-'''
-- could add github profile link to users table
 
-  
-'''
+class MentorshipRegistrations(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    mentorship_session = db.Column(db.Integer(), db.ForeignKey('mentorship_sessions.id'), nullable=False)
+
+
+class StudentDoubts(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    doubt = db.Column(db.String(), nullable=False)
+    responding_TA_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    response = db.Column(db.String(), nullable=False)
+
+
+class ChatbotInteractions(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    query = db.Column(db.String(), nullable=False)
+    response = db.Column(db.String(), nullable=False)
+
+
+class VivaSlots(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    time = db.Column(db.Date(), nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    examiner_name = db.Column(db.String(), nullable=False)
+    status = db.Column(db.Boolean(), nullable=True)  # pass or fail status - will be updated after viva is over
