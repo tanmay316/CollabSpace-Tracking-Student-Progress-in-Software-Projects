@@ -38,6 +38,5 @@ app.register_blueprint(admin, url_prefix="/api")
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
 jwt = JWTManager(app)
 
-
 if __name__ == '__main__':
     app.run(debug=True)
