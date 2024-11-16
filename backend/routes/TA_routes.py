@@ -4,6 +4,7 @@ from datetime import datetime
 
 ta = Blueprint("ta", __name__)
 
+
 @ta.route('/api/doubts', methods=['GET'])
 def get_doubts():
     doubts = StudentDoubts.query.all()
@@ -19,6 +20,7 @@ def get_doubts():
         })
     return jsonify(doubt_list)
 
+
 @ta.route('/api/chat/ta', methods=['GET'])
 def get_chat_history():
     student_id = request.args.get('student_id')
@@ -26,12 +28,13 @@ def get_chat_history():
     chat_history = ChatbotInteractions.query.filter(
         (ChatbotInteractions.user_id == student_id) | (ChatbotInteractions.user_id == ta_id)
     ).order_by(ChatbotInteractions.created_at).all()
-    
+
     messages = [
         {'query': interaction.query, 'response': interaction.response, 'timestamp': interaction.created_at.isoformat()}
         for interaction in chat_history
     ]
     return jsonify({'messages': messages})
+
 
 @ta.route('/api/chat/ta', methods=['POST'])
 def send_message():

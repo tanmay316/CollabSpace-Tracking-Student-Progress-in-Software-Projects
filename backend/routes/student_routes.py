@@ -1,14 +1,15 @@
 from flask import Blueprint, request, jsonify
 from models import *
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt # type: ignore
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
 student = Blueprint("student", __name__)
+
 
 @student.route('/api/projects/status/<int:student_id>', methods=['GET'])
 def get_project_status(student_id):
     submissions = MilestoneSubmissions.query.filter_by(student_id=student_id).all()
     status_data = []
-    
+
     for submission in submissions:
         milestone = Milestones.query.get(submission.milestone_id)
         status_data.append({
@@ -17,11 +18,12 @@ def get_project_status(student_id):
             'completion_status': 'completed' if submission.GitHub_repo_branch_link else 'pending',
             'deadline': milestone.deadline.isoformat()
         })
-    
+
     return jsonify(milestone_progress=status_data)
 
+
 @student.route("/link_github_repo", methods=["POST"])
-@jwt_required() 
+@jwt_required()
 # @role_required("student")
 def link_github_repo():
     student_id = get_jwt_identity()
@@ -43,8 +45,9 @@ def link_github_repo():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @student.route("/update_github_repo", methods=["PUT"])
-@jwt_required() 
+@jwt_required()
 # @role_required("student")
 def update_github_repo():
     student_id = get_jwt_identity()
@@ -66,13 +69,14 @@ def update_github_repo():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @student.route("/delete_github_repo", methods=["DELETE"])
-@jwt_required() 
+@jwt_required()
 # @role_required("student")
 def delete_github_repo():
     student_id = get_jwt_identity()
     student = Users.query.get(student_id)
-    
+
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
@@ -84,20 +88,22 @@ def delete_github_repo():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @student.route("/get_github_repo", methods=["GET"])
-@jwt_required() 
+@jwt_required()
 # @role_required("student")
 def get_github_repo():
     student_id = get_jwt_identity()
     student = Users.query.get(student_id)
-    
+
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
     return jsonify({"github_repo_link": student.Github}), 200
 
+
 @student.route("/home_page", methods=["GET"])
-@jwt_required() 
+@jwt_required()
 # @role_required("student")
 def get_all_milestones():
     try:
@@ -115,4 +121,3 @@ def get_all_milestones():
         return jsonify({"milestones": milestones_data}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-  

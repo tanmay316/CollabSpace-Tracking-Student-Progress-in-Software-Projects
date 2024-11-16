@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
 from models import *
 from datetime import datetime
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt # type: ignore
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
 instructor = Blueprint("instructor", __name__)
+
 
 def validate_milestone_input(data):
     errors = []
@@ -16,6 +17,7 @@ def validate_milestone_input(data):
     if not data.get("deadline"):
         errors.append("Deadline is required.")
     return errors
+
 
 @instructor.route('/api/milestones/comments', methods=['POST'])
 def add_milestone_comment():
@@ -30,8 +32,9 @@ def add_milestone_comment():
     db.session.commit()
     return jsonify({'message': 'Comment added successfully'}), 201
 
+
 @instructor.route("/create_milestone", methods=["POST"])
-@jwt_required() 
+@jwt_required()
 # @role_required("instructor")
 def create_milestone():
     data = request.get_json()
@@ -52,7 +55,8 @@ def create_milestone():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
-    
+
+
 @instructor.route("/milestones", methods=["GET"])
 # @role_required("instructor") 
 def get_all_milestones():
@@ -72,8 +76,9 @@ def get_all_milestones():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @instructor.route("/update_milestone/<int:milestone_id>", methods=["PUT"])
-@jwt_required() 
+@jwt_required()
 # @role_required("instructor") 
 def update_milestone(milestone_id):
     milestone = Milestones.query.get(milestone_id)
@@ -95,8 +100,9 @@ def update_milestone(milestone_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @instructor.route("/delete_milestone/<int:milestone_id>", methods=["DELETE"])
-@jwt_required() 
+@jwt_required()
 # @role_required("instructor")
 def delete_milestone(milestone_id):
     milestone = Milestones.query.get(milestone_id)
