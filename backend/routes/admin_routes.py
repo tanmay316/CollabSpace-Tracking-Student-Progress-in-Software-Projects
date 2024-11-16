@@ -9,10 +9,10 @@ admin = Blueprint("admin", __name__)
 # @role_required("admin")
 def get_data():
     try:
-        records = alldata.query.with_entities(
-            alldata.project_name,
-            alldata.enrollment_term,
-            alldata.completed
+        records = project_data.query.with_entities(
+            project_data.project_name,
+            project_data.enrollment_term,
+            project_data.completed
         ).all()
 
         data = [
