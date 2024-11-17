@@ -39,4 +39,110 @@ apis:
         user_story: "Instructor - provide feedback on student milestones."
         status: "Implemented"
 
-  
+  - name: "Student API"
+    endpoints:
+      - path: "/link_github_repo"
+        method: "POST"
+        description: "Allows students to link their GitHub repositories."
+        user_story: "Student - links GitHub repository for progress tracking."
+        status: "Implemented"
+
+      - path: "/update_github_repo"
+        method: "PUT"
+        description: "Updates the GitHub repository link for the student."
+        user_story: "Student - update GitHub repository."
+        status: "Implemented"
+
+      - path: "/delete_github_repo"
+        method: "DELETE"
+        description: "Deletes the student's GitHub repository link."
+        user_story: "Student - unlink GitHub repository."
+        status: "Implemented"
+
+      - path: "/get_github_repo"
+        method: "GET"
+        description: "Fetches the student's GitHub repository link."
+        user_story: "Student - retrieve linked GitHub repository."
+        status: "Implemented"
+
+      - path: "/home_page"
+        method: "GET"
+        description: "Fetches all project milestones."
+        user_story: "Student - view project milestones and deadlines."
+        status: "Implemented"
+
+      - path: "/api/projects/status"
+        method: "GET"
+        description: "Fetches the project status for a specific student."
+        user_story: "Student - track progress against milestones."
+        status: "Implemented"
+
+      - path: "/api/mentorship_sessions"
+        method: "GET"
+        description: "Lists available mentorship sessions."
+        user_story: "Student - view available mentorship sessions."
+        status: "Implemented"
+
+      - path: "/api/mentorship_sessions/register"
+        method: "POST"
+        description: "Registers a student for a mentorship session."
+        user_story: "Student - register for mentorship sessions."
+        status: "Implemented"
+
+  - name: "TA API"
+    endpoints:
+      - path: "/api/doubts"
+        method: "GET"
+        description: "Fetches all student doubts for the TA to review."
+        user_story: "TA - view and address student doubts."
+        status: "Implemented"
+
+      - path: "/api/chat/ta"
+        method: "POST"
+        description: "Sends a message from TA to a student."
+        user_story: "TA - send messages to students."
+        status: "Implemented"
+
+      - path: "/api/viva_slots"
+        method: "POST"
+        description: "Creates a new viva exam slot for student teams."
+        user_story: "TA - schedule and manage viva slots."
+        status: "Implemented"
+
+      - path: "/api/viva_slots"
+        method: "GET"
+        description: "Fetches all available viva slots."
+        user_story: "TA - view available viva slots."
+        status: "Implemented"
+
+      - path: "/api/viva_slots/<slot_id>"
+        method: "PUT"
+        description: "Updates an existing viva exam slot."
+        user_story: "TA - update viva slot details."
+        status: "Implemented"
+
+      - path: "/api/viva_slots/<slot_id>"
+        method: "DELETE"
+        description: "Deletes an existing viva exam slot."
+        user_story: "TA - delete viva slots."
+        status: "Implemented"
+        
+  - name: "Auth API"
+    endpoints:
+      - path: "/api/register"
+        method: "POST"
+        description: "Registers a new user (student, instructor, TA, etc.)"
+        user_story: "All users - account creation."
+        status: "Implemented"
+
+      - path: "/api/login"
+        method: "POST"
+        description: "Logs a user into the system."
+        user_story: "All users - login."
+        status: "Implemented"
+
+      - path: "/api/logout"
+        method: "POST"
+        description: "Logs a user out of the system."
+        user_story: "All users - logout."
+        status: "Implemented"
