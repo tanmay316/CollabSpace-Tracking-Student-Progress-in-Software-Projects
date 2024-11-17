@@ -34,7 +34,7 @@ app.register_blueprint(student)
 app.register_blueprint(instructor)
 app.register_blueprint(ta)
 app.register_blueprint(admin)
-app.register_blueprint(admin)
+app.register_blueprint(auth)
 
 # JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)

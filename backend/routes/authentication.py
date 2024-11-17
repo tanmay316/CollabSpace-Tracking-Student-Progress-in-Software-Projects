@@ -1,12 +1,14 @@
 from datetime import timedelta
 from functools import wraps
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, create_access_token, unset_jwt_cookies, decode_token, get_jwt, verify_jwt_in_request  # type: ignore
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, create_access_token, unset_jwt_cookies, \
+    decode_token, get_jwt, verify_jwt_in_request  # type: ignore
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import *
 
 auth = Blueprint("auth", __name__)
+
 
 def role_required(role):
     def wrapper(fn):
@@ -18,7 +20,9 @@ def role_required(role):
                 return fn(*args, **kwargs)
             else:
                 return jsonify({"message": "You Cannot Access This Page"}), 403
+
         return decorator
+
     return wrapper
 
 
@@ -80,8 +84,8 @@ def login():
     if not check_password_hash(user.pasword_hash, password):
         return jsonify({"message": "Incorrect Password"}), 400
 
-    access_token = create_access_token(identity=user.id, 
-                                       expires_delta=timedelta(days=10), 
+    access_token = create_access_token(identity=user.id,
+                                       expires_delta=timedelta(days=10),
                                        additional_claims={"role": role})
 
     user_info = {
@@ -108,6 +112,3 @@ def logout():
 
     unset_jwt_cookies(response)
     return response, 200
-
-
-

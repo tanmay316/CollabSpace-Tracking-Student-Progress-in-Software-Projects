@@ -49,8 +49,6 @@ def send_message():
     db.session.commit()
     return jsonify({'message': 'Message sent successfully'}), 201
 
-####
-ta = Blueprint('ta', __name__)
 
 @ta.route('/api/viva_slots', methods=['POST'])
 def create_viva_slot():
@@ -68,12 +66,14 @@ def create_viva_slot():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @ta.route('/api/viva_slots', methods=['GET'])
 def fetch_viva_slots():
     slots = VivaSlots.query.all()
     result = [{"id": slot.id, "time": slot.time, "student_id": slot.student_id,
                "examiner_name": slot.examiner_name, "status": slot.status} for slot in slots]
     return jsonify(result)
+
 
 @ta.route('/api/viva_slots/<int:slot_id>', methods=['PUT'])
 def update_viva_slot(slot_id):
@@ -91,6 +91,7 @@ def update_viva_slot(slot_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
 @ta.route('/api/viva_slots/<int:slot_id>', methods=['DELETE'])
 def delete_viva_slot(slot_id):
     try:
@@ -103,29 +104,3 @@ def delete_viva_slot(slot_id):
             return jsonify({"error": "Viva slot not found."}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 400
-
-####
-
-student = Blueprint('student', __name__)
-
-@student.route('/api/mentorship_sessions', methods=['GET'])
-def list_mentorship_sessions():
-    sessions = MentorshipSessions.query.all()
-    result = [{"id": session.id, "description": session.description,
-               "price": session.price, "mentor_name": session.mentor_name} for session in sessions]
-    return jsonify(result)
-
-@student.route('/api/mentorship_sessions/register', methods=['POST'])
-def register_mentorship_session():
-    data = request.get_json()
-    try:
-        registration = MentorshipRegistrations(
-            student_id=data['student_id'],
-            mentorship_session=data['session_id']
-        )
-        db.session.add(registration)
-        db.session.commit()
-        return jsonify({"message": "Registered for mentorship session successfully."}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
