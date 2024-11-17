@@ -1,3 +1,4 @@
 backend/.idea
 frontend/.vscode
 .DS_Store
+/backend/venv/
