@@ -1,17 +1,19 @@
 <template>
-    <nav class="navbar">
-        <div class="navbar-left">
-        <RouterLink to="/" class="brand">CollabSpace</RouterLink>
-      </div>
-      <div class="navbar-right">
-        <RouterLink to="/login" class="nav-item">Login</RouterLink>
-        <RouterLink to="/register" class="nav-item">Register</RouterLink>
-        <RouterLink to="/" class="nav-item">Logout</RouterLink>
-        <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
-        <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink> 
-      </div>
-    </nav>
-  </template>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <RouterLink to="/" class="brand">CollabSpace</RouterLink>
+    </div>
+    <div class="navbar-right">
+      <RouterLink to="/login" class="nav-item">Login</RouterLink>
+      <RouterLink to="/register" class="nav-item">Register</RouterLink>
+      <RouterLink to="/" class="nav-item">Logout</RouterLink>
+      <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
+      <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink>
+      <RouterLink to="/summaryai" class="nav-item">Summarizer</RouterLink>
+
+    </div>
+  </nav>
+</template>
   
   <style scoped>
   .navbar {

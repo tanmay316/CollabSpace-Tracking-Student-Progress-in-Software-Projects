@@ -39,6 +39,11 @@ const router = createRouter({
       component: () => import('../views/ChatUsersView.vue')
     },
     {
+      path: '/summaryai',
+      name: 'summaryai',
+      component: () => import('../views/SummaryAI.vue'),
+    },
+    {
       path:'/chatInterface',
       name:'chatInterface',
       component: () => import('../views/ChatInterfaceView.vue')

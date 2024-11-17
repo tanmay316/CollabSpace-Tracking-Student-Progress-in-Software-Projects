@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 
 
-
 # Import necessary files and functions from the project
 from models import *
 from routes.student_routes import student
@@ -16,6 +15,7 @@ from routes.TA_routes import ta
 from routes.admin_routes import admin
 from routes.authentication import auth
 from routes.rag_routes import rag 
+from routes.pdf_routes import pdf
 
 # Initialize app
 app = Flask(__name__)
@@ -39,6 +39,7 @@ app.register_blueprint(ta, url_prefix="/api/ta")
 app.register_blueprint(admin, url_prefix="/api/admin")
 app.register_blueprint(auth, url_prefix="/api/auth")
 app.register_blueprint(rag, url_prefix="/api/rag")
+app.register_blueprint(pdf, url_prefix="/api/pdf")
 
 # JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)

@@ -64,3 +64,7 @@ watchdog==4.0.1
 flask
 python-dotenv
 PyPDF2
+chromadb
+faiss-cpu
+langchain_google_genai
+langchain-community
