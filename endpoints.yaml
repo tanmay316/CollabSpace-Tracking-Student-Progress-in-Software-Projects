@@ -1,148 +1,311 @@
-apis:
-  - name: "Admin API"
-    endpoints:
-      - path: "/get_data"
-        method: "GET"
-        description: "Fetches project data for the administrator."
-        user_story: "Department Head - view overall student project progress."
-        status: "Implemented"
+openapi: 3.0.3
+info:
+  title: "Project API Documentation"
+  description: "This document describes the APIs for managing student projects, instructor tasks, TA duties, authentication, and generative AI integrations."
+  version: "1.0.0"
+servers:
+  - url: "https://api.example.com/v1"
+    description: "Production server"
+  
+paths:
+  /api/projects/status/{student_id}:
+    get:
+      summary: "Get project status for a specific student"
+      description: "This endpoint helps students track their project status, including milestone deadlines and completion status."
+      parameters:
+        - name: "student_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+          description: "ID of the student"
+      responses:
+        '200':
+          description: "Project status retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  student_id:
+                    type: "integer"
+                  project_status:
+                    type: "string"
+                    description: "Current status of the student's project"
+        '400':
+          description: "Bad Request"
 
-  - name: "Instructor API"
-    endpoints:
-      - path: "/create_milestone"
-        method: "POST"
-        description: "Allows instructors to create project milestones."
-        user_story: "Instructor - creates project milestones for students."
-        status: "Implemented"
+  /link_github_repo:
+    post:
+      summary: "Link a student's GitHub repository"
+      description: "Allows students to link their active GitHub repository to the system."
+      responses:
+        '201':
+          description: "GitHub repository linked successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  github_url:
+                    type: "string"
+                    description: "The linked GitHub repository URL"
+        '400':
+          description: "Bad Request"
 
-      - path: "/milestones"
-        method: "GET"
-        description: "Fetches all milestones for the instructor."
-        user_story: "Instructor - view project milestones."
-        status: "Implemented"
+  /update_github_repo:
+    put:
+      summary: "Update student's GitHub repository link"
+      description: "Allows students to update their GitHub repository link if needed."
+      responses:
+        '200':
+          description: "GitHub repository updated successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  github_url:
+                    type: "string"
+                    description: "Updated GitHub repository URL"
+        '400':
+          description: "Bad Request"
 
-      - path: "/update_milestone"
-        method: "PUT"
-        description: "Updates an existing project milestone."
-        user_story: "Instructor - update existing milestones."
-        status: "Implemented"
+  /get_github_repo:
+    get:
+      summary: "Get the student's linked GitHub repository"
+      description: "Allows students to view their currently linked GitHub repository."
+      responses:
+        '200':
+          description: "GitHub repository fetched successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  github_url:
+                    type: "string"
+                    description: "The currently linked GitHub repository URL"
+        '404':
+          description: "Repository not found"
 
-      - path: "/delete_milestone"
-        method: "DELETE"
-        description: "Deletes a project milestone."
-        user_story: "Instructor - delete project milestones."
-        status: "Implemented"
+  /api/mentorship_sessions/register:
+    post:
+      summary: "Register for mentorship sessions"
+      description: "Students can register for industry mentorship sessions."
+      responses:
+        '201':
+          description: "Mentorship session registered successfully"
+        '400':
+          description: "Bad Request"
+  
+  /create_milestone:
+    post:
+      summary: "Create project milestones"
+      description: "Instructors can create new project milestones with deadlines."
+      responses:
+        '201':
+          description: "Milestone created successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/milestones/comments"
-        method: "POST"
-        description: "Adds feedback on a student's milestone."
-        user_story: "Instructor - provide feedback on student milestones."
-        status: "Implemented"
+  /milestones:
+    get:
+      summary: "Retrieve all milestones"
+      description: "Instructors can view all the existing milestones."
+      responses:
+        '200':
+          description: "List of milestones"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    milestone_id:
+                      type: "integer"
+                    milestone_name:
+                      type: "string"
+        '404':
+          description: "No milestones found"
 
-  - name: "Student API"
-    endpoints:
-      - path: "/link_github_repo"
-        method: "POST"
-        description: "Allows students to link their GitHub repositories."
-        user_story: "Student - links GitHub repository for progress tracking."
-        status: "Implemented"
+  /api/milestones/comments:
+    post:
+      summary: "Add comments/feedback on milestones"
+      description: "Instructors can provide feedback to students on their milestones."
+      responses:
+        '201':
+          description: "Feedback added successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/update_github_repo"
-        method: "PUT"
-        description: "Updates the GitHub repository link for the student."
-        user_story: "Student - update GitHub repository."
-        status: "Implemented"
+  /update_milestone/{milestone_id}:
+    put:
+      summary: "Update existing milestone"
+      description: "Instructors can update an existing milestone's details."
+      parameters:
+        - name: "milestone_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Milestone updated successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/delete_github_repo"
-        method: "DELETE"
-        description: "Deletes the student's GitHub repository link."
-        user_story: "Student - unlink GitHub repository."
-        status: "Implemented"
+  /api/doubts:
+    get:
+      summary: "View all student doubts"
+      description: "TAs can retrieve a list of all doubts raised by students."
+      responses:
+        '200':
+          description: "List of student doubts"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    doubt_id:
+                      type: "integer"
+                    doubt_description:
+                      type: "string"
+        '404':
+          description: "No doubts found"
 
-      - path: "/get_github_repo"
-        method: "GET"
-        description: "Fetches the student's GitHub repository link."
-        user_story: "Student - retrieve linked GitHub repository."
-        status: "Implemented"
+  /api/viva_slots:
+    post:
+      summary: "Create a viva exam slot"
+      description: "TAs can create viva exam slots for students."
+      responses:
+        '201':
+          description: "Viva slot created successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/home_page"
-        method: "GET"
-        description: "Fetches all project milestones."
-        user_story: "Student - view project milestones and deadlines."
-        status: "Implemented"
+  /api/viva_slots/{slot_id}:
+    put:
+      summary: "Update viva exam slot"
+      description: "TAs can update viva slots with new times or examiner details."
+      parameters:
+        - name: "slot_id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Viva slot updated successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/projects/status"
-        method: "GET"
-        description: "Fetches the project status for a specific student."
-        user_story: "Student - track progress against milestones."
-        status: "Implemented"
+  /api/register:
+    post:
+      summary: "Register a new user"
+      description: "This endpoint registers a new user (student, instructor, or TA) and generates an access token."
+      responses:
+        '201':
+          description: "User registered successfully"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/mentorship_sessions"
-        method: "GET"
-        description: "Lists available mentorship sessions."
-        user_story: "Student - view available mentorship sessions."
-        status: "Implemented"
+  /api/login:
+    post:
+      summary: "User login"
+      description: "Allows users to log in and receive an access token."
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  access_token:
+                    type: "string"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/mentorship_sessions/register"
-        method: "POST"
-        description: "Registers a student for a mentorship session."
-        user_story: "Student - register for mentorship sessions."
-        status: "Implemented"
+  /api/logout:
+    post:
+      summary: "User logout"
+      description: "Logs the user out by invalidating the JWT token."
+      responses:
+        '200':
+          description: "Logout successful"
 
-  - name: "TA API"
-    endpoints:
-      - path: "/api/doubts"
-        method: "GET"
-        description: "Fetches all student doubts for the TA to review."
-        user_story: "TA - view and address student doubts."
-        status: "Implemented"
+  /api/ai/feedback:
+    post:
+      summary: "Get AI feedback on student projects"
+      description: "Students can get feedback from AI on their project submissions."
+      responses:
+        '200':
+          description: "AI feedback generated successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  feedback:
+                    type: "string"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/chat/ta"
-        method: "POST"
-        description: "Sends a message from TA to a student."
-        user_story: "TA - send messages to students."
-        status: "Implemented"
+  /api/ai/code_assistance:
+    post:
+      summary: "AI-powered code assistance"
+      description: "Generative AI assists in debugging code without writing it for the student."
+      responses:
+        '200':
+          description: "AI assistance provided"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  assistance:
+                    type: "string"
+        '400':
+          description: "Bad Request"
 
-      - path: "/api/viva_slots"
-        method: "POST"
-        description: "Creates a new viva exam slot for student teams."
-        user_story: "TA - schedule and manage viva slots."
-        status: "Implemented"
+  /github/commits:
+    get:
+      summary: "Fetch latest commits from the GitHub repository"
+      description: "Tracks student progress based on their GitHub commit history."
+      responses:
+        '200':
+          description: "GitHub commits retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    commit_id:
+                      type: "string"
+                    commit_message:
+                      type: "string"
+        '404':
+          description: "Commits not found"
 
-      - path: "/api/viva_slots"
-        method: "GET"
-        description: "Fetches all available viva slots."
-        user_story: "TA - view available viva slots."
-        status: "Implemented"
-
-      - path: "/api/viva_slots/<slot_id>"
-        method: "PUT"
-        description: "Updates an existing viva exam slot."
-        user_story: "TA - update viva slot details."
-        status: "Implemented"
-
-      - path: "/api/viva_slots/<slot_id>"
-        method: "DELETE"
-        description: "Deletes an existing viva exam slot."
-        user_story: "TA - delete viva slots."
-        status: "Implemented"
-        
-  - name: "Auth API"
-    endpoints:
-      - path: "/api/register"
-        method: "POST"
-        description: "Registers a new user (student, instructor, TA, etc.)"
-        user_story: "All users - account creation."
-        status: "Implemented"
-
-      - path: "/api/login"
-        method: "POST"
-        description: "Logs a user into the system."
-        user_story: "All users - login."
-        status: "Implemented"
-
-      - path: "/api/logout"
-        method: "POST"
-        description: "Logs a user out of the system."
-        user_story: "All users - logout."
-        status: "Implemented"
+  /ai/review_code:
+    post:
+      summary: "Review code quality using generative AI"
+      description: "Generative AI evaluates the quality of student code."
+      responses:
+        '200':
+          description: "Code review completed"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  review:
+                    type: "string"
+        '400':
+          description: "Bad Request"
