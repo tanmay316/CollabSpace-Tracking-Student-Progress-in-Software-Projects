@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import *
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
-from authentication import *
+from routes.authentication import *
 
 student = Blueprint("student", __name__)
 
@@ -148,7 +148,7 @@ def register_mentorship_session():
         return jsonify({"error": str(e)}), 400
 
 
-@student.route("/submit_milestone/<int: milestone_id>", methods=["POST"])
+@student.route("/submit_milestone/<int:milestone_id>", methods=["POST"])
 @role_required("student")
 def submit_milestone(milestone_id):
     """
@@ -176,7 +176,7 @@ def submit_milestone(milestone_id):
     }), 200
 
 
-@student.route("/get_submission/<int: milestone_id>", methods=["GET"])
+@student.route("/get_submission/<int:milestone_id>", methods=["GET"])
 @role_required("student")
 def get_submission(milestone_id):
     """

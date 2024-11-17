@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import *
-from authentication import *
+from routes.authentication import *
 from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
@@ -56,6 +56,7 @@ def create_milestone():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
 
 @instructor.route("/milestones", methods=["GET"])
 # @role_required("instructor") 
@@ -118,7 +119,7 @@ def delete_milestone(milestone_id):
         return jsonify({"error": str(e)}), 500
 
 
-@instructor.route("/get_submission/<int: milestone_id>", methods=["POST"])
+@instructor.route("/get_submission/<int:milestone_id>", methods=["POST"])
 def get_all_submissions(milestone_id):
     """
     Fetches all submissions made by students for a particular milestone
@@ -147,7 +148,7 @@ def get_all_submissions(milestone_id):
     }), 200
 
 
-@instructor.route("/add_feedback/<int: milestone_submission_id>", methods=["POST"])
+@instructor.route("/add_feedback/<int:milestone_submission_id>", methods=["POST"])
 @role_required("instructor")
 def add_feedback(milestone_submission_id):
     """
@@ -172,7 +173,7 @@ def add_feedback(milestone_submission_id):
     }), 200
 
 
-@instructor.route("/edit_feedback/<int: milestone_submission_id>", methods=["PUT"])
+@instructor.route("/edit_feedback/<int:milestone_submission_id>", methods=["PUT"])
 @role_required("instructor")
 def edit_feedback(milestone_submission_id):
     """

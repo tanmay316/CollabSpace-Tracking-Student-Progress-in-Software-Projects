@@ -10,6 +10,8 @@ class Users(db.Model):
     email = db.Column(db.String(), nullable=False, unique=True)
     password_hash = db.Column(db.String(), nullable=False)
     role = db.Column(db.String(), nullable=False)
+    github_repo = db.Column(db.String(), nullable=True)  # only for students - use frontend validation
+    # to ensure it gets filled
 
 
 class Milestones(db.Model):
@@ -27,7 +29,6 @@ class MilestoneSubmissions(db.Model):
     student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     github_branch_link = db.Column(db.String(), nullable=False)
     # needs to be a link - use frontend validation to ensure this
-
     marks = db.Column(db.Integer(), nullable=True)
     instructor_feedback = db.Column(db.String(), nullable=True, default="No feedback required")
     # can discuss if feedback should be compulsory
@@ -77,6 +78,7 @@ class VivaSlots(db.Model):
     student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
     examiner_name = db.Column(db.String(), nullable=False)
     status = db.Column(db.Boolean(), nullable=True)  # pass or fail status - will be updated after viva is over
+
 
 # Requested by Raj
 class ProjectData(db.Model):

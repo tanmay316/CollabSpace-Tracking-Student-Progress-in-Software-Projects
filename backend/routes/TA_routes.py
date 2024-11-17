@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import *
 from datetime import datetime
 
+from routes.authentication import *
 ta = Blueprint("ta", __name__)
 
 

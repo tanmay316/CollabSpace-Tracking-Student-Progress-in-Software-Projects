@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
 from models import *
-from flask_jwt_extended import jwt_required, get_jwt # type: ignore
+from routes.authentication import *
+from flask_jwt_extended import jwt_required, get_jwt  # type: ignore
 
 admin = Blueprint("admin", __name__)
 
+
 @admin.route("/get_data", methods=["GET"])
-@jwt_required() 
+@jwt_required()
 # @role_required("admin")
 def get_data():
     try:

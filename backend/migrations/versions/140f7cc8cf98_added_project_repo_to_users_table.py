@@ -1,8 +1,8 @@
-"""Initialized migrate and created DB
+"""Added project repo to users table
 
-Revision ID: 0ad3eedaabdd
+Revision ID: 140f7cc8cf98
 Revises: 
-Create Date: 2024-11-15 16:53:44.774002
+Create Date: 2024-11-17 15:06:30.009929
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0ad3eedaabdd'
+revision = '140f7cc8cf98'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,6 +33,13 @@ def upgrade():
     sa.Column('deadline', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('project_data',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('project_name', sa.String(), nullable=False),
+    sa.Column('enrollment_term', sa.String(), nullable=False),
+    sa.Column('completed', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('first_name', sa.String(), nullable=False),
@@ -40,6 +47,7 @@ def upgrade():
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('password_hash', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=False),
+    sa.Column('github_repo', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -64,10 +72,8 @@ def upgrade():
     sa.Column('milestone_id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
     sa.Column('github_branch_link', sa.String(), nullable=False),
-    sa.Column('marks', sa.Integer(), nullable=False),
+    sa.Column('marks', sa.Integer(), nullable=True),
     sa.Column('instructor_feedback', sa.String(), nullable=True),
-    sa.Column('evaluating_instructor_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['evaluating_instructor_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['milestone_id'], ['milestones.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -102,6 +108,7 @@ def downgrade():
     op.drop_table('mentorship_registrations')
     op.drop_table('chatbot_interactions')
     op.drop_table('users')
+    op.drop_table('project_data')
     op.drop_table('milestones')
     op.drop_table('mentorship_sessions')
     # ### end Alembic commands ###
