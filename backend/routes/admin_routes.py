@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import *
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt # type: ignore
 
 admin = Blueprint("admin", __name__)
 
@@ -9,10 +9,10 @@ admin = Blueprint("admin", __name__)
 # @role_required("admin")
 def get_data():
     try:
-        records = project_data.query.with_entities(
-            project_data.project_name,
-            project_data.enrollment_term,
-            project_data.completed
+        records = ProjectData.query.with_entities(
+            ProjectData.project_name,
+            ProjectData.enrollment_term,
+            ProjectData.completed
         ).all()
 
         data = [

@@ -81,7 +81,6 @@ class VivaSlots(db.Model):
     examiner_name = db.Column(db.String(), nullable=False)
     status = db.Column(db.Boolean(), nullable=True)  # pass or fail status - will be updated after viva is over
 
-
 # Requested by Raj
 class ProjectData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
