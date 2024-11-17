@@ -28,12 +28,9 @@ class MilestoneSubmissions(db.Model):
     github_branch_link = db.Column(db.String(), nullable=False)
     # needs to be a link - use frontend validation to ensure this
 
-    marks = db.Column(db.Integer(), nullable=False)
+    marks = db.Column(db.Integer(), nullable=True)
     instructor_feedback = db.Column(db.String(), nullable=True, default="No feedback required")
     # can discuss if feedback should be compulsory
-
-    evaluating_instructor_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    # ID of the instructor giving feedback
 
 
 # class InstructorFeedback(db.Model):

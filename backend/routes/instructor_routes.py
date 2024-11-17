@@ -119,29 +119,41 @@ def delete_milestone(milestone_id):
         return jsonify({"error": str(e)}), 500
 
 
-@instructor.route("/get_feedback/<int: milestone_submission_id", methods=["GET"])
-def get_feedback(milestone_submission_id):
+@instructor.route("/get_submission/<int: milestone_id>", methods=["POST"])
+def get_all_submissions(milestone_id):
     """
-    Since both student and instructor will need to read the feedback, please make the API call
-    to this route regardless of user. Icons to edit and delete feedback should obviously not be
-    available to student
+    Fetches all submissions made by students for a particular milestone
     """
-    submission = MilestoneSubmissions.query.get(milestone_submission_id)
-    if not submission:
-        return jsonify({
-            "message": "Submission doesn't exist"
-        }), 404
+    submissions = MilestoneSubmissions.query.filter_by(milestone_id=milestone_id).all()
 
-    feedback_details = [submission.id, submission.instructor_feedback, submission.marks]
+    if not submissions:
+        return jsonify({
+            "message": "No submissions were made yet"
+        }), 400
+
+    submissions_data = [
+        {
+            "id": submission.id,
+            "milestone_id": submission.milestone_id,
+            "student_id": submission.student_id,
+            "github_branch_link": submission.github_branch_link,
+            "marks": submission.marks,
+            "instructor_feedback": submission.instructor_feedback
+        }
+        for submission in submissions
+    ]
 
     return jsonify({
-        "feedback_details": feedback_details
+        "submissions_data": submissions_data
     }), 200
 
 
 @instructor.route("/add_feedback/<int: milestone_submission_id>", methods=["POST"])
 @role_required("instructor")
 def add_feedback(milestone_submission_id):
+    """
+    Add instructor feedback for a particular milestone submission
+    """
     submission = MilestoneSubmissions.query.get(milestone_submission_id)
     if not submission:
         return jsonify({
@@ -161,9 +173,12 @@ def add_feedback(milestone_submission_id):
     }), 200
 
 
-@instructor.route("/edit_feedback/<int: milestone_submission_id", methods=["PUT"])
+@instructor.route("/edit_feedback/<int: milestone_submission_id>", methods=["PUT"])
 @role_required("instructor")
 def edit_feedback(milestone_submission_id):
+    """
+    Feature to edit feedback given for a particular milestone submission
+    """
     data = request.get_json()
     submission = MilestoneSubmissions.query.get(milestone_submission_id)
     if not submission:

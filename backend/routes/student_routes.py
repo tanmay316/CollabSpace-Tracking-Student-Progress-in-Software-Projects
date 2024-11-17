@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from models import *
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
+from authentication import *
+
 student = Blueprint("student", __name__)
 
 
@@ -144,4 +146,63 @@ def register_mentorship_session():
         return jsonify({"message": "Registered for mentorship session successfully."}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@student.route("/submit_milestone/<int: milestone_id>", methods=["POST"])
+@role_required("student")
+def submit_milestone(milestone_id):
+    """
+    Allowed only once
+    """
+    if not Milestones.query.get(milestone_id):
+        return jsonify({
+            "message": "This milestone doesn't exist"
+        }), 400
+
+    data = request.get_json()
+    branch_link = data.get("github_branch_link")
+
+    new_submission = MilestoneSubmissions(
+        milestone_id=milestone_id,
+        student_id=get_jwt_identity(),
+        github_branch_link=branch_link
+    )
+
+    db.session.add(new_submission)
+    db.session.commit()
+
+    return jsonify({
+        "message": "Submitted Successfully"
+    }), 200
+
+
+@student.route("/get_submission/<int: milestone_id>", methods=["GET"])
+@role_required("student")
+def get_submission(milestone_id):
+    """
+    If no submission has been made yet, the submission form should be available. If a submission has been made,
+    the GitHub link, feedback and marks should be displayed. Editing milestones is not allowed
+    """
+
+    submission = MilestoneSubmissions.query.filter_by(student_id=get_jwt_identity(), milestone_id=milestone_id).first()
+    if not submission:
+        return jsonify({
+            "message": "No submission made yet"
+        }), 400
+
+    submission_details = {
+        "id": submission.id,
+        "student_id": submission.student_id,
+        "milestone_id": submission.milestone_id,
+        "github_branch_link": submission.github_branch_link,
+        "instructor_feedback": submission.instructor_feedback,
+        "marks": submission.marks
+    }
+
+    return jsonify({
+        "submission_details": submission_details
+    }), 200
+
+
+
 
