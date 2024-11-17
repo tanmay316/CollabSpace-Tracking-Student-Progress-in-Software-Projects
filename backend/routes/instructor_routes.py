@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import *
+from authentication import *
 from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: ignore
 
@@ -116,3 +117,67 @@ def delete_milestone(milestone_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@instructor.route("/get_feedback/<int: milestone_submission_id", methods=["GET"])
+def get_feedback(milestone_submission_id):
+    """
+    Since both student and instructor will need to read the feedback, please make the API call
+    to this route regardless of user. Icons to edit and delete feedback should obviously not be
+    available to student
+    """
+    submission = MilestoneSubmissions.query.get(milestone_submission_id)
+    if not submission:
+        return jsonify({
+            "message": "Submission doesn't exist"
+        }), 404
+
+    feedback_details = [submission.id, submission.instructor_feedback, submission.marks]
+
+    return jsonify({
+        "feedback_details": feedback_details
+    }), 200
+
+
+@instructor.route("/add_feedback/<int: milestone_submission_id>", methods=["POST"])
+@role_required("instructor")
+def add_feedback(milestone_submission_id):
+    submission = MilestoneSubmissions.query.get(milestone_submission_id)
+    if not submission:
+        return jsonify({
+            "message": "Submission doesn't exist"
+        }), 404
+    data = request.get_json()
+    feedback = data.get("feedback")
+    marks = data.get("marks")
+
+    submission.instructor_feedback = feedback
+    submission.marks = marks
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Added feedback successfully"
+    }), 200
+
+
+@instructor.route("/edit_feedback/<int: milestone_submission_id", methods=["PUT"])
+@role_required("instructor")
+def edit_feedback(milestone_submission_id):
+    data = request.get_json()
+    submission = MilestoneSubmissions.query.get(milestone_submission_id)
+    if not submission:
+        return jsonify({
+            "message": "Submission doesn't exist"
+        }), 404
+
+    if data.get("feedback"):
+        submission.feedback = data.get("feedback")
+    if data.get("marks"):
+        submission.marks = data.get("marks")
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Edited feedback successfully"
+    }), 200

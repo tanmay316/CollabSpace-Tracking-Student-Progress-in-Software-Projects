@@ -144,3 +144,4 @@ def register_mentorship_session():
         return jsonify({"message": "Registered for mentorship session successfully."}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+

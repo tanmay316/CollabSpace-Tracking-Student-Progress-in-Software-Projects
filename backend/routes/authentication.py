@@ -26,7 +26,7 @@ def role_required(role):
     return wrapper
 
 
-@auth.route("/api/register/", methods=["GET", "POST"])
+@auth.route("/register/", methods=["GET", "POST"])
 def register():
     data = request.get_json()
     first_name = data["first_name"]
@@ -69,7 +69,7 @@ def register():
                     "user_info": user_info}), 200
 
 
-@auth.route("/api/login", methods=["GET", "POST"])
+@auth.route("/login", methods=["GET", "POST"])
 def login():
     data = request.get_json()
     email = data["email"]
@@ -103,7 +103,7 @@ def login():
     }), 200
 
 
-@auth.route("/api/logout", methods=["GET", "POST"])
+@auth.route("/logout", methods=["GET", "POST"])
 @jwt_required()
 def logout():
     response = jsonify({
