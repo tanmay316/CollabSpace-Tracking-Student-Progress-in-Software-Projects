@@ -4,7 +4,7 @@ info:
   description: "This document describes the APIs for managing student projects, instructor tasks, TA duties, authentication, and generative AI integrations."
   version: "1.0.0"
 servers:
-  - url: "https://api.example.com/v1"
+  - url: "http://localhost:5000/"
     description: "Production server"
   
 paths:
