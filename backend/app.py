@@ -30,11 +30,11 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # Defines blueprints for routes based on users
-app.register_blueprint(student)
-app.register_blueprint(instructor)
-app.register_blueprint(ta)
-app.register_blueprint(admin)
-app.register_blueprint(auth)
+app.register_blueprint(student, url_prefix="/api/student")
+app.register_blueprint(instructor, url_prefix="/api/instructor")
+app.register_blueprint(ta, url_prefix="/api/ta")
+app.register_blueprint(admin, url_prefix="/api/admin")
+app.register_blueprint(auth, url_prefix="/api/auth")
 
 # JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
