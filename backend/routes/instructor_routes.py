@@ -12,7 +12,7 @@ def validate_milestone_input(data):
         errors.append("Title is required.")
     if not data.get("description"):
         errors.append("Description is required.")
-    if not data.get("issue_date"):
+    if not data.get("date_issued"):
         errors.append("Issue date is required.")
     if not data.get("deadline"):
         errors.append("Deadline is required.")
@@ -34,7 +34,7 @@ def add_milestone_comment():
 
 
 @instructor.route("/create_milestone", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 # @role_required("instructor")
 def create_milestone():
     data = request.get_json()
@@ -46,7 +46,7 @@ def create_milestone():
         new_milestone = Milestones(
             title=data["title"],
             description=data["description"],
-            issue_date=datetime.strptime(data["issue_date"], "%Y-%m-%d"),
+            date_issued=datetime.strptime(data["date_issued"], "%Y-%m-%d"),
             deadline=datetime.strptime(data["deadline"], "%Y-%m-%d")
         )
         db.session.add(new_milestone)
@@ -55,7 +55,6 @@ def create_milestone():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
-
 
 @instructor.route("/milestones", methods=["GET"])
 # @role_required("instructor") 
@@ -67,7 +66,7 @@ def get_all_milestones():
                 "id": milestone.id,
                 "title": milestone.title,
                 "description": milestone.description,
-                "issue_date": milestone.issue_date.strftime("%Y-%m-%d"),
+                "date_issued": milestone.date_issued.strftime("%Y-%m-%d"),
                 "deadline": milestone.deadline.strftime("%Y-%m-%d")
             }
             for milestone in milestones
@@ -78,7 +77,7 @@ def get_all_milestones():
 
 
 @instructor.route("/update_milestone/<int:milestone_id>", methods=["PUT"])
-@jwt_required()
+# @jwt_required()
 # @role_required("instructor") 
 def update_milestone(milestone_id):
     milestone = Milestones.query.get(milestone_id)
@@ -88,8 +87,8 @@ def update_milestone(milestone_id):
     data = request.get_json()
     milestone.title = data.get("title", milestone.title)
     milestone.description = data.get("description", milestone.description)
-    if "issue_date" in data:
-        milestone.issue_date = datetime.strptime(data["issue_date"], "%Y-%m-%d")
+    if "date_issued" in data:
+        milestone.date_issued = datetime.strptime(data["date_issued"], "%Y-%m-%d")
     if "deadline" in data:
         milestone.deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
 
@@ -102,7 +101,7 @@ def update_milestone(milestone_id):
 
 
 @instructor.route("/delete_milestone/<int:milestone_id>", methods=["DELETE"])
-@jwt_required()
+# @jwt_required()
 # @role_required("instructor")
 def delete_milestone(milestone_id):
     milestone = Milestones.query.get(milestone_id)
