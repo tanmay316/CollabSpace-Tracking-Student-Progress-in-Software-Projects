@@ -7,3 +7,36 @@ apis:
         user_story: "Department Head - view overall student project progress."
         status: "Implemented"
 
+  - name: "Instructor API"
+    endpoints:
+      - path: "/create_milestone"
+        method: "POST"
+        description: "Allows instructors to create project milestones."
+        user_story: "Instructor - creates project milestones for students."
+        status: "Implemented"
+
+      - path: "/milestones"
+        method: "GET"
+        description: "Fetches all milestones for the instructor."
+        user_story: "Instructor - view project milestones."
+        status: "Implemented"
+
+      - path: "/update_milestone"
+        method: "PUT"
+        description: "Updates an existing project milestone."
+        user_story: "Instructor - update existing milestones."
+        status: "Implemented"
+
+      - path: "/delete_milestone"
+        method: "DELETE"
+        description: "Deletes a project milestone."
+        user_story: "Instructor - delete project milestones."
+        status: "Implemented"
+
+      - path: "/api/milestones/comments"
+        method: "POST"
+        description: "Adds feedback on a student's milestone."
+        user_story: "Instructor - provide feedback on student milestones."
+        status: "Implemented"
+
+ 
