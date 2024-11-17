@@ -1,0 +1,9 @@
+apis:
+  - name: "Admin API"
+    endpoints:
+      - path: "/get_data"
+        method: "GET"
+        description: "Fetches project data for the administrator."
+        user_story: "Department Head - view overall student project progress."
+        status: "Implemented"
+
