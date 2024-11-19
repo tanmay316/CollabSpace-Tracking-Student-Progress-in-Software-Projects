@@ -1,311 +1,291 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: "Project API Documentation"
-  description: "This document describes the APIs for managing student projects, instructor tasks, TA duties, authentication, and generative AI integrations."
-  version: "1.0.0"
+  title: CollabSpace APIs
+  version: 2.0.0
+  description: API for managing various aspects of the educational platform, including students, authentication, instructors, TAs, AI processing, and RAG functionality.
+
 servers:
-  - url: "http://localhost:5000/"
-    description: "Production server"
-  
+  - url: http://localhost:5000
+    description: Development server
+
 paths:
-  /api/projects/status/{student_id}:
+  ### AUTH ENDPOINTS ###
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Validation error
+
+  /api/auth/login:
+    post:
+      summary: User login
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Invalid credentials
+
+  /api/auth/logout:
+    post:
+      summary: Logout a user
+      tags:
+        - Auth
+      responses:
+        200:
+          description: Logout successful
+
+  ### STUDENT ENDPOINTS ###
+  /api/students/{student_id}/milestones:
     get:
-      summary: "Get project status for a specific student"
-      description: "This endpoint helps students track their project status, including milestone deadlines and completion status."
+      summary: Get milestones for a student
+      tags:
+        - Students
       parameters:
-        - name: "student_id"
-          in: "path"
+        - name: student_id
+          in: path
           required: true
           schema:
-            type: "integer"
-          description: "ID of the student"
+            type: integer
       responses:
-        '200':
-          description: "Project status retrieved successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  student_id:
-                    type: "integer"
-                  project_status:
-                    type: "string"
-                    description: "Current status of the student's project"
-        '400':
-          description: "Bad Request"
+        200:
+          description: List of student milestones
 
-  /link_github_repo:
+  /api/students/{student_id}/doubts:
     post:
-      summary: "Link a student's GitHub repository"
-      description: "Allows students to link their active GitHub repository to the system."
+      summary: Submit a doubt
+      tags:
+        - Students
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                doubt:
+                  type: string
       responses:
-        '201':
-          description: "GitHub repository linked successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  github_url:
-                    type: "string"
-                    description: "The linked GitHub repository URL"
-        '400':
-          description: "Bad Request"
+        201:
+          description: Doubt submitted successfully
 
-  /update_github_repo:
-    put:
-      summary: "Update student's GitHub repository link"
-      description: "Allows students to update their GitHub repository link if needed."
-      responses:
-        '200':
-          description: "GitHub repository updated successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  github_url:
-                    type: "string"
-                    description: "Updated GitHub repository URL"
-        '400':
-          description: "Bad Request"
-
-  /get_github_repo:
+  /api/students/{student_id}/profile:
     get:
-      summary: "Get the student's linked GitHub repository"
-      description: "Allows students to view their currently linked GitHub repository."
+      summary: Fetch student profile
+      tags:
+        - Students
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
-        '200':
-          description: "GitHub repository fetched successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  github_url:
-                    type: "string"
-                    description: "The currently linked GitHub repository URL"
-        '404':
-          description: "Repository not found"
+        200:
+          description: Student profile data
 
-  /api/mentorship_sessions/register:
-    post:
-      summary: "Register for mentorship sessions"
-      description: "Students can register for industry mentorship sessions."
-      responses:
-        '201':
-          description: "Mentorship session registered successfully"
-        '400':
-          description: "Bad Request"
-  
+  ### INSTRUCTOR ENDPOINTS ###
   /create_milestone:
     post:
-      summary: "Create project milestones"
-      description: "Instructors can create new project milestones with deadlines."
+      summary: Create a new milestone
+      tags:
+        - Instructor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                date_issued:
+                  type: string
+                  format: date
+                deadline:
+                  type: string
+                  format: date
       responses:
-        '201':
-          description: "Milestone created successfully"
-        '400':
-          description: "Bad Request"
+        201:
+          description: Milestone created successfully
 
-  /milestones:
+  /api/instructors/{instructor_id}/students:
     get:
-      summary: "Retrieve all milestones"
-      description: "Instructors can view all the existing milestones."
-      responses:
-        '200':
-          description: "List of milestones"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    milestone_id:
-                      type: "integer"
-                    milestone_name:
-                      type: "string"
-        '404':
-          description: "No milestones found"
-
-  /api/milestones/comments:
-    post:
-      summary: "Add comments/feedback on milestones"
-      description: "Instructors can provide feedback to students on their milestones."
-      responses:
-        '201':
-          description: "Feedback added successfully"
-        '400':
-          description: "Bad Request"
-
-  /update_milestone/{milestone_id}:
-    put:
-      summary: "Update existing milestone"
-      description: "Instructors can update an existing milestone's details."
+      summary: Get students assigned to an instructor
+      tags:
+        - Instructor
       parameters:
-        - name: "milestone_id"
-          in: "path"
+        - name: instructor_id
+          in: path
           required: true
           schema:
-            type: "integer"
+            type: integer
       responses:
-        '200':
-          description: "Milestone updated successfully"
-        '400':
-          description: "Bad Request"
+        200:
+          description: List of students
 
+  ### TA ENDPOINTS ###
   /api/doubts:
     get:
-      summary: "View all student doubts"
-      description: "TAs can retrieve a list of all doubts raised by students."
+      summary: Get all doubts for review
+      tags:
+        - TA
       responses:
-        '200':
-          description: "List of student doubts"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    doubt_id:
-                      type: "integer"
-                    doubt_description:
-                      type: "string"
-        '404':
-          description: "No doubts found"
+        200:
+          description: List of doubts
+
+  /api/chat/ta:
+    get:
+      summary: Get TA-student chat history
+      tags:
+        - TA
+      parameters:
+        - name: student_id
+          in: query
+          schema:
+            type: integer
+        - name: ta_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Chat history
 
   /api/viva_slots:
-    post:
-      summary: "Create a viva exam slot"
-      description: "TAs can create viva exam slots for students."
-      responses:
-        '201':
-          description: "Viva slot created successfully"
-        '400':
-          description: "Bad Request"
-
-  /api/viva_slots/{slot_id}:
-    put:
-      summary: "Update viva exam slot"
-      description: "TAs can update viva slots with new times or examiner details."
-      parameters:
-        - name: "slot_id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-      responses:
-        '200':
-          description: "Viva slot updated successfully"
-        '400':
-          description: "Bad Request"
-
-  /api/register:
-    post:
-      summary: "Register a new user"
-      description: "This endpoint registers a new user (student, instructor, or TA) and generates an access token."
-      responses:
-        '201':
-          description: "User registered successfully"
-        '400':
-          description: "Bad Request"
-
-  /api/login:
-    post:
-      summary: "User login"
-      description: "Allows users to log in and receive an access token."
-      responses:
-        '200':
-          description: "Login successful"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  access_token:
-                    type: "string"
-        '400':
-          description: "Bad Request"
-
-  /api/logout:
-    post:
-      summary: "User logout"
-      description: "Logs the user out by invalidating the JWT token."
-      responses:
-        '200':
-          description: "Logout successful"
-
-  /api/ai/feedback:
-    post:
-      summary: "Get AI feedback on student projects"
-      description: "Students can get feedback from AI on their project submissions."
-      responses:
-        '200':
-          description: "AI feedback generated successfully"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  feedback:
-                    type: "string"
-        '400':
-          description: "Bad Request"
-
-  /api/ai/code_assistance:
-    post:
-      summary: "AI-powered code assistance"
-      description: "Generative AI assists in debugging code without writing it for the student."
-      responses:
-        '200':
-          description: "AI assistance provided"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  assistance:
-                    type: "string"
-        '400':
-          description: "Bad Request"
-
-  /github/commits:
     get:
-      summary: "Fetch latest commits from the GitHub repository"
-      description: "Tracks student progress based on their GitHub commit history."
+      summary: Get available viva slots
+      tags:
+        - TA
       responses:
-        '200':
-          description: "GitHub commits retrieved successfully"
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    commit_id:
-                      type: "string"
-                    commit_message:
-                      type: "string"
-        '404':
-          description: "Commits not found"
+        200:
+          description: List of viva slots
 
-  /ai/review_code:
+  ### AI ENDPOINTS ###
+  /upload:
     post:
-      summary: "Review code quality using generative AI"
-      description: "Generative AI evaluates the quality of student code."
+      summary: Upload and process files for AI analysis
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
-        '200':
-          description: "Code review completed"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  review:
-                    type: "string"
-        '400':
-          description: "Bad Request"
+        200:
+          description: Files processed successfully
+
+  /summarize:
+    post:
+      summary: Generate AI-based summaries for uploaded content
+      tags:
+        - AI
+      responses:
+        200:
+          description: Document summary
+
+  /api/ai/query:
+    post:
+      summary: Custom AI queries based on uploaded data
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                context:
+                  type: string
+      responses:
+        200:
+          description: Query response from AI
+
+  ### RAG ENDPOINTS ###
+  /api/rag/documents:
+    post:
+      summary: Upload documents for RAG
+      tags:
+        - RAG
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: Documents uploaded successfully
+
+  /api/rag/query:
+    post:
+      summary: Query documents using RAG
+      tags:
+        - RAG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+      responses:
+        200:
+          description: Query result
