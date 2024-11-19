@@ -1,0 +1,291 @@
+openapi: 3.0.0
+info:
+  title: CollabSpace APIs
+  version: 2.0.0
+  description: API for managing various aspects of the educational platform, including students, authentication, instructors, TAs, AI processing, and RAG functionality.
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+
+paths:
+  ### AUTH ENDPOINTS ###
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Validation error
+
+  /api/auth/login:
+    post:
+      summary: User login
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Invalid credentials
+
+  /api/auth/logout:
+    post:
+      summary: Logout a user
+      tags:
+        - Auth
+      responses:
+        200:
+          description: Logout successful
+
+  ### STUDENT ENDPOINTS ###
+  /api/students/{student_id}/milestones:
+    get:
+      summary: Get milestones for a student
+      tags:
+        - Students
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of student milestones
+
+  /api/students/{student_id}/doubts:
+    post:
+      summary: Submit a doubt
+      tags:
+        - Students
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                doubt:
+                  type: string
+      responses:
+        201:
+          description: Doubt submitted successfully
+
+  /api/students/{student_id}/profile:
+    get:
+      summary: Fetch student profile
+      tags:
+        - Students
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Student profile data
+
+  ### INSTRUCTOR ENDPOINTS ###
+  /create_milestone:
+    post:
+      summary: Create a new milestone
+      tags:
+        - Instructor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                date_issued:
+                  type: string
+                  format: date
+                deadline:
+                  type: string
+                  format: date
+      responses:
+        201:
+          description: Milestone created successfully
+
+  /api/instructors/{instructor_id}/students:
+    get:
+      summary: Get students assigned to an instructor
+      tags:
+        - Instructor
+      parameters:
+        - name: instructor_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of students
+
+  ### TA ENDPOINTS ###
+  /api/doubts:
+    get:
+      summary: Get all doubts for review
+      tags:
+        - TA
+      responses:
+        200:
+          description: List of doubts
+
+  /api/chat/ta:
+    get:
+      summary: Get TA-student chat history
+      tags:
+        - TA
+      parameters:
+        - name: student_id
+          in: query
+          schema:
+            type: integer
+        - name: ta_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Chat history
+
+  /api/viva_slots:
+    get:
+      summary: Get available viva slots
+      tags:
+        - TA
+      responses:
+        200:
+          description: List of viva slots
+
+  ### AI ENDPOINTS ###
+  /upload:
+    post:
+      summary: Upload and process files for AI analysis
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        200:
+          description: Files processed successfully
+
+  /summarize:
+    post:
+      summary: Generate AI-based summaries for uploaded content
+      tags:
+        - AI
+      responses:
+        200:
+          description: Document summary
+
+  /api/ai/query:
+    post:
+      summary: Custom AI queries based on uploaded data
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                context:
+                  type: string
+      responses:
+        200:
+          description: Query response from AI
+
+  ### RAG ENDPOINTS ###
+  /api/rag/documents:
+    post:
+      summary: Upload documents for RAG
+      tags:
+        - RAG
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: Documents uploaded successfully
+
+  /api/rag/query:
+    post:
+      summary: Query documents using RAG
+      tags:
+        - RAG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+      responses:
+        200:
+          description: Query result

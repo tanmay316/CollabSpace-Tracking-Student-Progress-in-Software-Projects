@@ -7,7 +7,7 @@ admin = Blueprint("admin", __name__)
 
 
 @admin.route("/get_data", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 # @role_required("admin")
 def get_data():
     try:

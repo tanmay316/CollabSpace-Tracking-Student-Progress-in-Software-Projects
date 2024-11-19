@@ -6,7 +6,6 @@ from routes.authentication import *
 
 student = Blueprint("student", __name__)
 
-
 @student.route('/api/projects/status/<int:student_id>', methods=['GET'])
 def get_project_status(student_id):
     submissions = MilestoneSubmissions.query.filter_by(student_id=student_id).all()
@@ -25,7 +24,7 @@ def get_project_status(student_id):
 
 
 @student.route("/link_github_repo", methods=["POST"])
-@jwt_required()
+# @jwt_required()
 # @role_required("student")
 def link_github_repo():
     student_id = get_jwt_identity()
@@ -49,7 +48,7 @@ def link_github_repo():
 
 
 @student.route("/update_github_repo", methods=["PUT"])
-@jwt_required()
+# @jwt_required()
 # @role_required("student")
 def update_github_repo():
     student_id = get_jwt_identity()
@@ -73,7 +72,7 @@ def update_github_repo():
 
 
 @student.route("/delete_github_repo", methods=["DELETE"])
-@jwt_required()
+# @jwt_required()
 # @role_required("student")
 def delete_github_repo():
     student_id = get_jwt_identity()
@@ -92,7 +91,7 @@ def delete_github_repo():
 
 
 @student.route("/get_github_repo", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 # @role_required("student")
 def get_github_repo():
     student_id = get_jwt_identity()
@@ -105,7 +104,7 @@ def get_github_repo():
 
 
 @student.route("/home_page", methods=["GET"])
-@jwt_required()
+# @jwt_required()
 # @role_required("student")
 def get_all_milestones():
     try:
