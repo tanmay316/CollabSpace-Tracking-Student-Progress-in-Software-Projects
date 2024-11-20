@@ -20,7 +20,7 @@ def validate_milestone_input(data):
     return errors
 
 
-@instructor.route('/api/milestones/comments', methods=['POST'])
+@instructor.route('/milestones/comments', methods=['POST'])
 def add_milestone_comment():
     data = request.json
     new_feedback = InstructorFeedback(

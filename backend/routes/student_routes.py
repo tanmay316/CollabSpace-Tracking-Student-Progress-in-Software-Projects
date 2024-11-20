@@ -124,7 +124,7 @@ def get_all_milestones():
         return jsonify({"error": str(e)}), 500
 
 
-@student.route('/api/mentorship_sessions', methods=['GET'])
+@student.route('/mentorship_sessions', methods=['GET'])
 def list_mentorship_sessions():
     sessions = MentorshipSessions.query.all()
     result = [{"id": session.id, "description": session.description,
@@ -132,7 +132,7 @@ def list_mentorship_sessions():
     return jsonify(result)
 
 
-@student.route('/api/mentorship_sessions/register', methods=['POST'])
+@student.route('/mentorship_sessions/register', methods=['POST'])
 def register_mentorship_session():
     data = request.get_json()
     try:
