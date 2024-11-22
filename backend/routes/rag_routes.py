@@ -24,7 +24,7 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # State management
 state = {
     "repo_details": {"name": "", "files2code": {}, "entire_code": ""},
-    "uploaded_content": "",  # Holds content from uploaded files
+    "uploaded_content": "",
     "messages": [],
     "title": "Provide a GitHub Repo link or Upload Files",
 }
@@ -82,7 +82,6 @@ def submit():
         state["title"] = "Chat with Uploaded Files"
 
     return jsonify({"message": "Setup complete. You can now chat!"})
-
 
 @rag.route("/chat", methods=["POST"])
 def chat():
