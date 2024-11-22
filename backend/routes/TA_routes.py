@@ -24,42 +24,56 @@ def get_doubts():
 
 @ta.route('/api/chat/ta', methods=['GET'])
 def get_chat_history():
-    student_id = request.args.get('student_id')
-    ta_id = request.args.get('ta_id')
-    chat_history = ChatbotInteractions.query.filter(
-        (ChatbotInteractions.user_id == student_id) | (ChatbotInteractions.user_id == ta_id)
-    ).order_by(ChatbotInteractions.created_at).all()
+    data = request.get_json()
+    student_id = data["student_id"]
+    ta_id = data['ta_id']
 
-    messages = [
-        {'query': interaction.query, 'response': interaction.response, 'timestamp': interaction.created_at.isoformat()}
-        for interaction in chat_history
-    ]
-    return jsonify({'messages': messages})
+    # student_id = request.args.get('student_id')
+    # ta_id = request.args.get('ta_id')
+
+    # chat_history = ChatbotInteractions.query.filter(
+    #     (ChatbotInteractions.user_id == student_id) | (ChatbotInteractions.user_id == ta_id)
+    # ).order_by(ChatbotInteractions.created_at).all()
+
+    # messages = [
+    #     {'query': interaction.query, 'response': interaction.response, 'timestamp': interaction.created_at.isoformat()}
+    #     for interaction in chat_history
+    # ]
+    # if messages:
+    #     return jsonify({'messages': messages})
+        
+    return jsonify({'message': "No chats found"})
 
 
 @ta.route('/api/chat/ta', methods=['POST'])
 def send_message():
-    data = request.json
-    new_message = ChatbotInteractions(
-        user_id=data['ta_id'],
-        query=data['message'],
-        response=data['response'],
-        created_at=datetime.utcnow()
-    )
-    db.session.add(new_message)
-    db.session.commit()
+    # data = request.json
+    # new_message = ChatbotInteractions(
+    #     user_id=data['ta_id'],
+    #     query=data['message'],
+    #     response=data['response'],
+    #     created_at=datetime.utcnow()
+    # )
+    # db.session.add(new_message)
+    # db.session.commit()
     return jsonify({'message': 'Message sent successfully'}), 201
 
-
+#pending: student id?
+#time: dynamic
 @ta.route('/api/viva_slots', methods=['POST'])
 def create_viva_slot():
+    import datetime
+    x = datetime.datetime.now()
     data = request.get_json()
     try:
         viva_slot = VivaSlots(
-            time=data['time'],
-            student_id=data['student_id'],
+            time=x,
+            # time=data['time'],
+            # student_id=data['student_id'],
+            student_id='None',
             examiner_name=data['examiner_name'],
-            status=False  # Initially set to False
+            # examiner_name='None',
+            status=False
         )
         db.session.add(viva_slot)
         db.session.commit()
@@ -76,7 +90,7 @@ def fetch_viva_slots():
     return jsonify(result)
 
 
-@ta.route('/api/viva_slots/<int:slot_id>', methods=['PUT'])
+@ta.route('/api/viva_slots/<int:slot_id>', methods=['POST'])
 def update_viva_slot(slot_id):
     data = request.get_json()
     try:

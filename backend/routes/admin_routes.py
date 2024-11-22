@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt  # type: ignore
 
 admin = Blueprint("admin", __name__)
 
-
+#pending
 @admin.route("/get_data", methods=["GET"])
 # @jwt_required()
 # @role_required("admin")

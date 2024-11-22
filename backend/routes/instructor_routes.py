@@ -6,7 +6,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: 
 
 instructor = Blueprint("instructor", __name__)
 
-
 def validate_milestone_input(data):
     errors = []
     if not data.get("title"):
@@ -20,18 +19,18 @@ def validate_milestone_input(data):
     return errors
 
 
-@instructor.route('/milestones/comments', methods=['POST'])
-def add_milestone_comment():
-    data = request.json
-    new_feedback = InstructorFeedback(
-        milestone_id=data['milestone_id'],
-        student_id=data['student_id'],
-        feedback=data['comment'],
-        created_at=datetime.utcnow()
-    )
-    db.session.add(new_feedback)
-    db.session.commit()
-    return jsonify({'message': 'Comment added successfully'}), 201
+# @instructor.route('/milestones/comments', methods=['POST'])
+# def add_milestone_comment():
+#     data = request.json
+#     new_feedback = InstructorFeedback(
+#         milestone_id=data['milestone_id'],
+#         student_id=data['student_id'],
+#         feedback=data['comment'],
+#         created_at=datetime.utcnow()
+#     )
+#     db.session.add(new_feedback)
+#     db.session.commit()
+#     return jsonify({'message': 'Comment added successfully'}), 201
 
 
 @instructor.route("/create_milestone", methods=["POST"])
@@ -58,27 +57,27 @@ def create_milestone():
         return jsonify({"error": str(e)}), 500
 
 
-@instructor.route("/milestones", methods=["GET"])
-# @role_required("instructor") 
-def get_all_milestones():
-    try:
-        milestones = Milestones.query.all()
-        milestones_data = [
-            {
-                "id": milestone.id,
-                "title": milestone.title,
-                "description": milestone.description,
-                "date_issued": milestone.date_issued.strftime("%Y-%m-%d"),
-                "deadline": milestone.deadline.strftime("%Y-%m-%d")
-            }
-            for milestone in milestones
-        ]
-        return jsonify({"milestones": milestones_data}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @instructor.route("/milestones", methods=["GET"])
+# # @role_required("instructor") 
+# def get_all_milestones():
+#     try:
+#         milestones = Milestones.query.all()
+#         milestones_data = [
+#             {
+#                 "id": milestone.id,
+#                 "title": milestone.title,
+#                 "description": milestone.description,
+#                 "date_issued": milestone.date_issued.strftime("%Y-%m-%d"),
+#                 "deadline": milestone.deadline.strftime("%Y-%m-%d")
+#             }
+#             for milestone in milestones
+#         ]
+#         return jsonify({"milestones": milestones_data}), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
-@instructor.route("/update_milestone/<int:milestone_id>", methods=["PUT"])
+@instructor.route("/update_milestone/<int:milestone_id>", methods=["POST"])
 # @jwt_required()
 # @role_required("instructor") 
 def update_milestone(milestone_id):
@@ -118,8 +117,8 @@ def delete_milestone(milestone_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
-@instructor.route("/get_submission/<int:milestone_id>", methods=["POST"])
+#pending
+@instructor.route("/get_submission/<int:milestone_id>", methods=["GET"])
 def get_all_submissions(milestone_id):
     """
     Fetches all submissions made by students for a particular milestone
@@ -149,7 +148,7 @@ def get_all_submissions(milestone_id):
 
 
 @instructor.route("/add_feedback/<int:milestone_submission_id>", methods=["POST"])
-@role_required("instructor")
+# @role_required("instructor")
 def add_feedback(milestone_submission_id):
     """
     Add instructor feedback for a particular milestone submission
@@ -173,8 +172,8 @@ def add_feedback(milestone_submission_id):
     }), 200
 
 
-@instructor.route("/edit_feedback/<int:milestone_submission_id>", methods=["PUT"])
-@role_required("instructor")
+@instructor.route("/edit_feedback/<int:milestone_submission_id>", methods=["POST"])
+# @role_required("instructor")
 def edit_feedback(milestone_submission_id):
     """
     Feature to edit feedback given for a particular milestone submission

@@ -45,6 +45,5 @@ app.register_blueprint(pdf, url_prefix="/api/pdf")
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
 jwt = JWTManager(app)
 
-
 if __name__ == '__main__':
     app.run(debug=True)

@@ -27,8 +27,9 @@ def get_project_status(student_id):
 # @jwt_required()
 # @role_required("student")
 def link_github_repo():
-    student_id = get_jwt_identity()
+    # student_id = get_jwt_identity()
     data = request.get_json()
+    student_id = data["student_id"]
     github_repo_link = data.get("github_repo_link")
 
     if not github_repo_link:
@@ -38,7 +39,7 @@ def link_github_repo():
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
-    student.Github = github_repo_link
+    student.github_repo = github_repo_link
     try:
         db.session.commit()
         return jsonify({"message": "GitHub repository linked successfully"}), 200
@@ -51,8 +52,10 @@ def link_github_repo():
 # @jwt_required()
 # @role_required("student")
 def update_github_repo():
-    student_id = get_jwt_identity()
+    # student_id = get_jwt_identity()
     data = request.get_json()
+    student_id = data["student_id"]
+
     new_github_repo_link = data.get("github_repo_link")
 
     if not new_github_repo_link:
@@ -62,7 +65,7 @@ def update_github_repo():
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
-    student.Github = new_github_repo_link
+    student.github_repo = new_github_repo_link
     try:
         db.session.commit()
         return jsonify({"message": "GitHub repository updated successfully"}), 200
@@ -71,17 +74,20 @@ def update_github_repo():
         return jsonify({"error": str(e)}), 500
 
 
-@student.route("/delete_github_repo", methods=["DELETE"])
+@student.route("/delete_github_repo", methods=["POST"])
 # @jwt_required()
 # @role_required("student")
 def delete_github_repo():
-    student_id = get_jwt_identity()
+    # student_id = get_jwt_identity()
+
+    data = request.get_json()
+    student_id = data["student_id"]
     student = Users.query.get(student_id)
 
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
-    student.Github = None
+    student.github_repo = ""
     try:
         db.session.commit()
         return jsonify({"message": "GitHub repository deleted successfully"}), 200
@@ -94,16 +100,19 @@ def delete_github_repo():
 # @jwt_required()
 # @role_required("student")
 def get_github_repo():
-    student_id = get_jwt_identity()
+    # student_id = get_jwt_identity()
+    data = request.get_json()
+    student_id = data["student_id"]
     student = Users.query.get(student_id)
 
     if student is None:
         return jsonify({"error": "Student not found"}), 404
 
-    return jsonify({"github_repo_link": student.Github}), 200
+    return jsonify({"github_repo_link": student.github_repo}), 200
 
 
-@student.route("/home_page", methods=["GET"])
+# completion status -> if any submission made before deadline
+@student.route("/milestones", methods=["GET"])
 # @jwt_required()
 # @role_required("student")
 def get_all_milestones():
@@ -114,7 +123,7 @@ def get_all_milestones():
                 "id": milestone.id,
                 "title": milestone.title,
                 "description": milestone.description,
-                "issue_date": milestone.issue_date.strftime("%Y-%m-%d"),
+                "date_issued": milestone.date_issued.strftime("%Y-%m-%d"),
                 "deadline": milestone.deadline.strftime("%Y-%m-%d")
             }
             for milestone in milestones
@@ -123,7 +132,9 @@ def get_all_milestones():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+#create mentorship session()
+#delete mentorship session()
+#update mentorship session()
 @student.route('/mentorship_sessions', methods=['GET'])
 def list_mentorship_sessions():
     sessions = MentorshipSessions.query.all()
@@ -131,7 +142,25 @@ def list_mentorship_sessions():
                "price": session.price, "mentor_name": session.mentor_name} for session in sessions]
     return jsonify(result)
 
+#pending
+#book_viva_slots()
+@student.route('/book_viva_slot', methods=['POST'])
+def book_viva_slot():
+    vivaSlot=VivaSlots.query.get(id)
+    if not vivaSlot:
+        return jsonify({
+            "message": "viva slot doesn't exist"
+        }), 404
 
+    if vivaSlot:
+        vivaSlot.status = true
+
+    db.session.commit()
+    return jsonify({"message": "Viva slot booked successfully."}), 201
+
+#make_milestone_submissions() -> rag, submit()
+
+# pending
 @student.route('/mentorship_sessions/register', methods=['POST'])
 def register_mentorship_session():
     data = request.get_json()
@@ -148,7 +177,7 @@ def register_mentorship_session():
 
 
 @student.route("/submit_milestone/<int:milestone_id>", methods=["POST"])
-@role_required("student")
+# @role_required("student")
 def submit_milestone(milestone_id):
     """
     Allowed only once
@@ -163,7 +192,8 @@ def submit_milestone(milestone_id):
 
     new_submission = MilestoneSubmissions(
         milestone_id=milestone_id,
-        student_id=get_jwt_identity(),
+        # student_id=get_jwt_identity(),
+        student_id=data['student_id'],
         github_branch_link=branch_link
     )
 
@@ -174,6 +204,7 @@ def submit_milestone(milestone_id):
         "message": "Submitted Successfully"
     }), 200
 
+#update_milestone_submission
 
 @student.route("/get_submission/<int:milestone_id>", methods=["GET"])
 @role_required("student")
