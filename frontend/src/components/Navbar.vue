@@ -6,7 +6,7 @@
     <div class="navbar-right">
       <RouterLink to="/login" class="nav-item">Login</RouterLink>
       <RouterLink to="/register" class="nav-item">Register</RouterLink>
-      <RouterLink to="/" class="nav-item">Logout</RouterLink>
+      <RouterLink to="/" class="nav-item" @click="logout">Logout</RouterLink>
       <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
       <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink>
       <RouterLink to="/summaryai" class="nav-item">Summarizer</RouterLink>
@@ -14,6 +14,33 @@
     </div>
   </nav>
 </template>
+
+<script setup>
+import axios from "axios";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const logout = async () => {
+  try {
+    const response = await axios.post("http://127.0.0.1:5000/api/auth/logout", {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+
+    alert(response.data.message || "Logged out successfully!");
+
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_info");
+
+    router.push("/");
+  } catch (error) {
+    console.error("Logout failed:", error.response || error.message);
+    alert(error.response?.data?.message || "An error occurred while logging out.");
+  }
+};
+</script>
   
   <style scoped>
   .navbar {
@@ -24,11 +51,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1f2937; /* Dark background */
+    background-color: #1f2937;
     color: white;
     padding: 10px 24px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* Ensure it stays above other content */
+    z-index: 1000;
   }
   
   .navbar-left .brand {
