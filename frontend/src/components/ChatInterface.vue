@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="sidebar">
-      <h1>CollabSpace AI Chatbot</h1>
+      <h1>Ai Chatbot</h1>
       <form @submit.prevent="handleSubmit">
         <label for="repolink">GitHub Repo Link:</label>
         <input type="text" v-model="repolink" placeholder="Enter GitHub Repo Link" />
@@ -15,7 +15,7 @@
     </div>
 
     <div class="main-content">
-      <h2 style="color: black;">Chat with Code File and GitHub Repo</h2>
+      <h2 style="color: black;">Query wrt Context</h2>
       <div class="chat-section" ref="chatBox">
         <p v-for="(msg, index) in chatMessages" :key="index">
           <strong>{{ msg.role }}:</strong> {{ msg.content }}
@@ -26,7 +26,7 @@
         <button @click="sendMessage">Ask</button>
       </div>
 
-      <h2 style="color: black;">Ask and Debug</h2>
+      <h2 style="color: black;">Talk 2 Ai</h2>
       <div class="chat-section" ref="directChatBox">
         <p v-for="(msg, index) in directMessages" :key="index">
           <strong>{{ msg.role }}:</strong> {{ msg.content }}
@@ -146,10 +146,11 @@ export default {
 <style scoped>
 .container {
   display: flex;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
   height: calc(100vh - 60px);
-  /* Adjusted height to account for navbar */
-  margin-top: 50px;
-  /* Add gap below navbar */
+  margin: 5rem;
+  padding: 2rem;
 }
 
 .sidebar {
@@ -159,6 +160,14 @@ export default {
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
+  border-radius: 0.5rem;
+}
+
+.h1{
+  color: gray;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .sidebar h1 {
@@ -209,10 +218,9 @@ export default {
   border: 1px solid #0b0a0a;
   border-radius: 5px;
   padding: 10px;
-  background-color: #8d8d8f;
+  background-color: darkgrey;
   overflow-y: auto;
   max-height: 200px;
-  /* Reduced height for better fit */
   margin-bottom: 10px;
 }
 
@@ -224,8 +232,6 @@ export default {
 .chat-input input {
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid #b91818;
-  border-radius: 5px;
 }
 
 .chat-input button {
