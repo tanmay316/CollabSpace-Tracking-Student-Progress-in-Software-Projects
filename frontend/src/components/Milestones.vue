@@ -3,19 +3,28 @@
       <div class="header">Milestones</div>
       <div class="content">
         <div class="create-container">
-            <div class="card-header">
-              <h3>Title: </h3>
-              <input type="text">
-            </div>
-            <div class="card-body">
-              <p>Description: </p>
-              <input type="text">
-            </div>
-            <div class="create-milestone">+ Milestone</div>
+          <div class="card-header">
+            <h3>Title: </h3>
+            <input type="text" v-model="milestone.title" />
           </div>
-        <RouterLink to='/submission'>
-        <div class="grid">
+          <div class="card-body">
+            <p>Description: </p>
+            <input type="text" v-model="milestone.description" />
+          </div>
+          <div class="card-body">
+            <p>Date Issued: </p>
+            <input type="date" v-model="milestone.date_issued" />
+          </div>
+          <div class="card-body">
+            <p>Deadline: </p>
+            <input type="date" v-model="milestone.deadline" />
+          </div>
+          <div class="create-milestone" @click="createMilestone">
+            + Milestone
+          </div>
+        </div>
 
+        <div class="grid">
           <div 
             v-for="milestone in milestones" 
             :key="milestone.id" 
@@ -27,75 +36,149 @@
             }"
           >
             <div class="card-header">
-              <h3>{{ milestone.title }}</h3>
+              <h3><RouterLink to='/submission'>{{ milestone.title }}</RouterLink></h3>
               <div class="stats">
                 <span :class="statusClass(milestone.status)">
                   {{ milestone.status }}
                 </span>
-                <div class="mile-icon">❌</div>
+                <div class="mile-icon" @click="deleteMilestone(milestone.id)">❌</div>
               </div>
             </div>
             <div class="card-body">
               <p>{{ milestone.description }}</p>
+              <p color="cyan">{{ milestone.date_issued }}</p>
+              <p color="pink">{{ milestone.deadline }}</p>
             </div>
             <div class="edit-body">
-              <input type="text">
-              <div class="mile-icon">✏️</div>
+              <div class="edits">
+                <p>Title:</p>
+                <input type="text" v-model="editedMilestone.title" />
+                <p>Description:</p>
+                <input type="text" v-model="editedMilestone.description" />
+                <p>Date Issued:</p>
+                <input type="date" v-model="editedMilestone.date_issued" />
+                <p>Deadline:</p>
+                <input type="date" v-model="editedMilestone.deadline" />
+              </div>
+              <div class="mile-icon" @click="updateMilestone(milestone.id)">✏️</div>
             </div>
           </div>
         </div>
-      </RouterLink>
       </div>
     </div>
   </template>
   
   <script setup>
-  const milestones = [
-    {
-      id: 0,
-      title: 'Milestone 1',
-      description: 'CRUD Operations.',
-      status: 'pending'
-    },
-    {
-      id: 1,
-      title: 'Milestone 2',
-      description: 'Setting up the project repository and structure.',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'Milestone 3',
-      description: 'Implementing the user interface and frontend logic.',
-      status: 'incomplete'
-    },
-    {
-      id: 3,
-      title: 'Milestone 4',
-      description: 'Integrating the backend APIs with the frontend.',
-      status: 'pending'
-    },
-    {
-      id: 4,
-      title: 'Milestone 5',
-      description: 'Running tests and deploying the project.',
-      status: 'pending'
+  import axios from "axios";
+  import { ref } from "vue";
+
+  const milestone = ref({
+    title: "",
+    description: "",
+    date_issued: "",
+    deadline: "",
+  });
+
+  const createMilestone = async () => {
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/api/instructor/create_milestone", milestone.value);
+      alert(response.data.message);
+      milestone.value = {
+        title: "",
+        description: "",
+        date_issued: "",
+        deadline: "",
+      };
+    } catch (error) {
+      console.error(error.response.data);
+      alert(error.response.data.errors || error.response.data.error);
     }
-  ];
+  };
+
+  const editedMilestone = ref({
+    title: "",
+    description: "",
+    date_issued: "",
+    deadline: "",
+  });
+  
+  const updateMilestone = async (milestoneId) => {
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:5000/api/instructor/update_milestone/${milestoneId}`,
+        editedMilestone.value
+      );
+      alert(response.data.message);
+      editedMilestone.value = {
+        title: "",
+        description: "",
+        date_issued: "",
+        deadline: "",
+      };
+    } catch (error) {
+      console.error(error.response.data);
+      alert(error.response.data.error);
+    }
+  };
+  
+  const milestones = ref([]);
+  
+  const fetchMilestones = async () => {
+    try {
+      const milestoneResponse = await axios.get("http://127.0.0.1:5000/api/student/milestones");
+      const milestoneData = milestoneResponse.data.milestones;
+  
+      for (const milestone of milestoneData) {
+        try {
+          const submissionResponse = await axios.get(
+            `http://127.0.0.1:5000/student/get_submission/${milestone.id}`
+          );
+          milestone.status = "completed";
+        } catch (error) {
+          const currentDate = new Date();
+          const deadlineDate = new Date(milestone.deadline);
+          milestone.status = currentDate > deadlineDate ? "incomplete" : "pending";
+        }
+      }
+      milestones.value = milestoneData;
+    } catch (err) {
+      console.error("Error fetching milestones:", err);
+    }
+  };
+  fetchMilestones();
   
   const statusClass = (status) => {
     switch (status) {
-      case 'completed':
-        return 'status-green';
-      case 'pending':
-        return 'status-white';
-      case 'incomplete':
-        return 'status-red';
+      case "completed":
+        return "status-green";
+      case "pending":
+        return "status-grey";
+      case "incomplete":
+        return "status-red";
       default:
-        return '';
+        return "";
     }
   };
+
+  const deleteMilestone = async (milestoneId) => {
+    const confirmation = confirm("Are you sure you want to delete this milestone?");
+    if (!confirmation) return;
+
+    try {
+      const response = await axios.delete(
+        `http://127.0.0.1:5000/api/instructor/delete_milestone/${milestoneId}`
+      );
+      alert(response.data.message);
+
+      milestones.value = milestones.value.filter((m) => m.id !== milestoneId);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      alert(error.response?.data?.error || "An error occurred while deleting.");
+    }
+  };
+
   </script>
+  
   
   <style scoped>
   .stats{
@@ -104,18 +187,32 @@
     align-items: center;
   }
 
+  .edits{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+  }
+
   .edit-body{
     gap: 0.5rem;
     display: flex;
-    margin: 0.5rem;
-    padding: 0.5rem;
+    margin: 0 0.5rem;
+    padding: 0 0.5rem;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
+    border-top: 1px solid #e5e7eb
   }
 
   .mile-icon{
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .mile-icon:hover{
+    cursor: pointer;
+    transform: scale(1.05);
+    background-color: #06b6d4;
   }
 
   .create-milestone{
@@ -141,6 +238,7 @@
   .create-container{
     max-width: 70vh;
     padding: 0.5rem;
+    margin-bottom: 1rem;
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -218,7 +316,9 @@
   }
   
   .card-body {
-    padding: 16px;
+    margin: 0 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
   }
   
   .card-body p {
