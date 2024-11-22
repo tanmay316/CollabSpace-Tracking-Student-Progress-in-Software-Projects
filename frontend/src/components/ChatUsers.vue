@@ -2,7 +2,7 @@
   <div class="chat-users">
     <h2>Chat</h2>
     <ul>
-    <RouterLink to='/chatInterface'> 
+    <RouterLink to='/'> 
       <li 
         v-for="user in users" 
         :key="user.id" 

@@ -4,58 +4,75 @@
 
     <div>
       <label for="email">Email:</label>
-      <input type="email" v-model="email" required><br><br>
-      
+      <input type="email" v-model="email" required /><br /><br />
+
       <label for="password">Password:</label>
-      <input type="password" v-model="password" required><br><br>
-      
-      <button>Login</button>
+      <input type="password" v-model="password" required /><br /><br />
+
+      <button @click="login">Login</button>
     </div>
 
     <p>
-      <!-- Don't have an account? <router-link to="/register">Register</router-link> -->
-      <!-- Don't have an account? <router-link to="/register"><button>Register</button></router-link>  -->
-    </p><br>
-    <!-- <div style="font-weight: bold;" v-if="loginFailed" class="alert">
-      Login failed. Please check your credentials.
-    </div> -->
+      Don't have an account? 
+      <router-link to="/register">
+        <button>Register</button>
+      </router-link>
+    </p>
+    <br />
+
+    <div v-if="errorMessage" class="alert">
+      {{ errorMessage }}
+    </div>
   </div>
 </template>
-  
-<script>
-// import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      loginFailed: false,
-    };
-  },
-//   mounted(){
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
-//   },
-//   methods: {
-//     login(email,password) {
-//       axios.get(`http://127.0.0.1:4000/login?email=${email}&password=${password}`)
-//       .then((response)=>{
-//         if(response.data==='login failed'){
-//           this.loginFailed = true;
-//         }else{
-//           localStorage.setItem('accessToken','Bearer '+response.data.access_token)
-//           localStorage.setItem('email',email)
-//           this.email = '';
-//           this.password = '';
-//           this.loginFailed = false;
-//           this.$router.push('/');
-//           setTimeout(() => {
-//               location.reload();
-//             }, 300);
-//         }
-//       })
-//     },
-//   },
+const email = ref('');
+const password = ref('');
+const errorMessage = ref('');
+const router = useRouter();
+
+const login = async () => {
+  if (!email.value || !password.value) {
+    errorMessage.value = 'Email and Password are required.';
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://127.0.0.1:5000/api/auth/login', {
+      email: email.value,
+      password: password.value,
+    });
+
+    alert(response.data.message || 'Login successful!');
+
+    // Save access token and user info to local storage
+    const { access_token, admin_info } = response.data;
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('user_info', JSON.stringify(admin_info));
+
+    // Redirect based on user role
+    const userRole = admin_info.role.toLowerCase();
+    console.log(userRole)
+    router.push('/')
+    // if (userRole === 'admin') {
+    //   router.push('/admin/dashboard');
+    // } else if (userRole === 'ta') {
+    //   router.push('/ta/dashboard');
+    // } else if (userRole === 'instructor') {
+    //   router.push('/instructor/dashboard');
+    // } else {
+    //   router.push('/student/dashboard');
+    // }
+  } catch (error) {
+    errorMessage.value =
+      error.response?.data?.message || 'Login failed. Please check your credentials.';
+    console.error(error.response || error.message);
+  }
 };
 </script>
   

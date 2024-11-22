@@ -34,45 +34,52 @@
 </div>
 </template>
 
-<script>
-//import axios from 'axios';
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
-export default {
-  data() {
-    return {
-      selectedRole:'user'
-    };
-  },
-  mounted() {
+const firstName = ref('');
+const lastName = ref('');
+const email = ref('');
+const password = ref('');
+const password2 = ref('');
+const selectedRole = ref('student');
+const router = useRouter();
 
-  },
-  methods: {
-    register() {
-      const newUser = {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email,
-        password: this.password,
-        role: this.selectedRole
-      };
-      if(this.password===this.password2){
-        axios.post('http://127.0.0.1:4000/register', newUser,{
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
-        .then(() => {
-          this.firstName = '';
-          this.lastName = '';
-          this.email = '';
-          this.password = '';
-          this.$router.push('/login');
-          })
-          .catch(error => {
-            console.error('Error adding new user:', error);
-          });
-        }else alert('password do not match')
-    }
+const register = async () => {
+  if (!firstName.value || !lastName.value || !email.value || !password.value || !password2.value) {
+    alert('All fields are required.');
+    return;
+  }
+
+  if (password.value !== password2.value) {
+    alert('Passwords do not match.');
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://127.0.0.1:5000/api/auth/register', {
+      first_name: firstName.value,
+      last_name: lastName.value,
+      email: email.value,
+      password: password.value,
+      role: selectedRole.value,
+    });
+
+    alert(response.data.message || 'Registration successful!');
+
+    // Save user info and token in local storage
+    const { access_token, user_info } = response.data;
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('user_info', JSON.stringify(user_info));
+
+    router.push('/login');
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || 'Failed to register. Please try again.';
+    alert(errorMessage);
+    console.error(error.response || error.message);
   }
 };
 </script>

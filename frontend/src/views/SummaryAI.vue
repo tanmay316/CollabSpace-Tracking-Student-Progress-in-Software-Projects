@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="sidebar">
-            <h1>Upload and Chat</h1>
+            <h1>Upload</h1>
             <input type="file" ref="fileInput" multiple />
             <button @click="uploadFiles">Submit & Process</button>
         </div>
@@ -23,14 +23,14 @@
                 <input type="text" v-model="question" placeholder="Ask a question or summarize..."
                     @keypress.enter="askQuestion" />
                 <button @click="askQuestion">Ask</button>
-                <button @click="summarizeFile">Summarize</button> <!-- Summarize button -->
+                <button @click="summarizeFile">Summarize</button>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-const API_BASE_URL = "http://127.0.0.1:5000/api/pdf"; // Adjust to match your backend API
+const API_BASE_URL = "http://127.0.0.1:5000/api/pdf";
 
 export default {
     data() {
@@ -140,9 +140,14 @@ export default {
 .container {
     display: flex;
     height: calc(100vh - 70px);
-    /* Adjust for navbar */
-    margin-top: 70px;
-    /* Margin for navbar */
+    margin: 5rem;
+}
+
+h1{
+    color: gray;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .sidebar {
@@ -183,11 +188,6 @@ export default {
     border-left: 1px solid #ddd;
 }
 
-h1 {
-    text-align: center;
-    color: black;
-}
-
 .messages {
     flex-grow: 1;
     overflow-y: auto;
@@ -220,9 +220,11 @@ h1 {
 }
 
 .chat-input {
+    gap: 0.5rem;
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    padding: 0.5rem 0;
+    justify-content: space-between;
+    align-items: baseline;
 }
 
 .chat-input input {
