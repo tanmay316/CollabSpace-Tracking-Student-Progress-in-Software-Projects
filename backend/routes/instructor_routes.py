@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # type: 
 
 instructor = Blueprint("instructor", __name__)
 
+
 def validate_milestone_input(data):
     errors = []
     if not data.get("title"):
@@ -117,7 +118,8 @@ def delete_milestone(milestone_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-#pending
+
+# pending
 @instructor.route("/get_submission/<int:milestone_id>", methods=["GET"])
 def get_all_submissions(milestone_id):
     """

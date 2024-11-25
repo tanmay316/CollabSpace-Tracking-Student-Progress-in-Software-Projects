@@ -6,6 +6,7 @@ from routes.authentication import *
 
 student = Blueprint("student", __name__)
 
+
 @student.route('/api/projects/status/<int:student_id>', methods=['GET'])
 def get_project_status(student_id):
     submissions = MilestoneSubmissions.query.filter_by(student_id=student_id).all()
@@ -132,9 +133,10 @@ def get_all_milestones():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#create mentorship session()
-#delete mentorship session()
-#update mentorship session()
+
+# create mentorship session()
+# delete mentorship session()
+# update mentorship session()
 @student.route('/mentorship_sessions', methods=['GET'])
 def list_mentorship_sessions():
     sessions = MentorshipSessions.query.all()
@@ -142,11 +144,12 @@ def list_mentorship_sessions():
                "price": session.price, "mentor_name": session.mentor_name} for session in sessions]
     return jsonify(result)
 
+
 #pending
-#book_viva_slots()
+#  book_viva_slots()
 @student.route('/book_viva_slot', methods=['POST'])
 def book_viva_slot():
-    vivaSlot=VivaSlots.query.get(id)
+    vivaSlot = VivaSlots.query.get(id)
     if not vivaSlot:
         return jsonify({
             "message": "viva slot doesn't exist"
@@ -158,7 +161,8 @@ def book_viva_slot():
     db.session.commit()
     return jsonify({"message": "Viva slot booked successfully."}), 201
 
-#make_milestone_submissions() -> rag, submit()
+
+# make_milestone_submissions() -> rag, submit()
 
 # pending
 @student.route('/mentorship_sessions/register', methods=['POST'])
@@ -204,7 +208,6 @@ def submit_milestone(milestone_id):
         "message": "Submitted Successfully"
     }), 200
 
-#update_milestone_submission
 
 @student.route("/get_submission/<int:milestone_id>", methods=["GET"])
 @role_required("student")
@@ -232,7 +235,3 @@ def get_submission(milestone_id):
     return jsonify({
         "submission_details": submission_details
     }), 200
-
-
-
-
