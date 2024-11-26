@@ -32,7 +32,7 @@ def register():
     first_name = data["first_name"]
     last_name = data["last_name"]
     email = data["email"]
-    password=data["password"]
+    password = data["password"]
     # password_hash = generate_password_hash(data["password"])
     role = data["role"]
 
@@ -109,3 +109,18 @@ def logout():
     response = jsonify({"message": "Logged out Successfully"})
     unset_jwt_cookies(response)
     return response, 200
+
+
+# Only for testing, remove comment in a separate branch if required.
+# @auth.route("/delete_user/<int:user_id>", methods=["DELETE"])
+# def delete_user(user_id):
+#     user = Users.query.get(user_id)
+#     if not user:
+#         return jsonify({"msg": "This User Does Not Exist"}), 400
+#
+#     db.session.delete(user)
+#     db.session.commit()
+#
+#     return jsonify({
+#         "message": "Delete user successfully"
+#     }), 200
