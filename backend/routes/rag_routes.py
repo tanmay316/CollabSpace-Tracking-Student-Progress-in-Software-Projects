@@ -83,6 +83,7 @@ def submit():
 
     return jsonify({"message": "Setup complete. You can now chat!"})
 
+
 @rag.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
@@ -132,16 +133,22 @@ def chat():
 def direct_chat():
     data = request.get_json()
     user_message = data.get("message")
+
     if not user_message:
         return jsonify({"error": "No message provided."}), 400
 
-    if "code" in user_message.lower():
-        return jsonify(
-            {"response": "Sorry, I cannot provide or generate code in this mode."}
-        )
+    # Prepare the prompt to prevent code generation
+    system_instruction = "You are an assistant who does not generate or provide code under any circumstances. Please respond with helpful information without providing code examples."
 
     try:
+        # Start the chat with the system instruction to prevent code generation
         chat = model.start_chat()
+
+        # Adding the system instruction as the initial message in the conversation
+        gemini_resp = chat.send_message(system_instruction, stream=True)
+        assistant_response = "".join(streamer(gemini_resp))
+
+        # Now continue the conversation with the user's message
         gemini_resp = chat.send_message(user_message, stream=True)
         assistant_response = "".join(streamer(gemini_resp))
     except Exception:
