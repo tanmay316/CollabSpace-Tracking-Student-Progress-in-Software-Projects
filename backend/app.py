@@ -5,10 +5,6 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from datetime import datetime
 import os
-from flask_mail import Mail, Message
-from celery.schedules import crontab
-from celery import Celery
-from celery.schedules import crontab
 
 # Import necessary files and functions from the project
 from models import *
@@ -19,6 +15,11 @@ from routes.admin_routes import admin
 from routes.authentication import auth
 from routes.rag_routes import rag 
 from routes.pdf_routes import pdf
+
+from celery_worker import celery_init_app
+from celery.result import AsyncResult
+# from tasks import send_deadline_reminder
+from celery.schedules import crontab
 
 # Initialize app
 app = Flask(__name__)
@@ -48,44 +49,18 @@ app.register_blueprint(pdf, url_prefix="/api/pdf")
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
 jwt = JWTManager(app)
 
-app.config['MAIL_SERVER'] = 'localhost'
-app.config['MAIL_PORT'] = 1025           
-app.config['MAIL_USERNAME'] = None      
-app.config['MAIL_PASSWORD'] = None
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = False
-mail = Mail(app)
+celery_app = celery_init_app(app)
 
-# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+from tasks import send_deadline_reminder
+def setup_periodic_tasks(sender, **kwargs):
 
-app.config['broker_url'] = 'redis://localhost:6379/0'
-app.config['result_backend'] = 'redis://localhost:6379/0'
+    sender.add_periodic_task(
+        crontab(hour=18, minute=23),
 
-def make_celery(app: Flask) -> Celery:
-    celery = Celery(
-        app.import_name,
-        broker=app.config['broker_url'],  # Updated key
-        backend=app.config['result_backend']  # Updated key
+        send_deadline_reminder.s(),
     )
-    celery.conf.update(app.config)
 
-    class ContextTask(celery.Task):
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
-
-celery = make_celery(app)
-
-celery.conf.beat_schedule = {
-    'send-reminder-emails-daily': {
-        'task': 'send_reminder_emails',
-        'schedule': crontab(hour=16, minute=45),
-    },
-}
+celery_app.on_after_configure.connect(setup_periodic_tasks)
 
 if __name__ == '__main__':
     app.run(debug=True)
