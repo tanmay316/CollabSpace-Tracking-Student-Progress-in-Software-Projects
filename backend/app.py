@@ -8,6 +8,7 @@ import os
 from flask_mail import Mail, Message
 from celery.schedules import crontab
 from celery import Celery
+from celery.schedules import crontab
 
 # Import necessary files and functions from the project
 from models import *
@@ -55,14 +56,17 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+# app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+# app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+app.config['broker_url'] = 'redis://localhost:6379/0'
+app.config['result_backend'] = 'redis://localhost:6379/0'
 
 def make_celery(app: Flask) -> Celery:
     celery = Celery(
         app.import_name,
-        broker=app.config['CELERY_BROKER_URL'],
-        backend=app.config['CELERY_RESULT_BACKEND']
+        broker=app.config['broker_url'],  # Updated key
+        backend=app.config['result_backend']  # Updated key
     )
     celery.conf.update(app.config)
 
@@ -75,6 +79,13 @@ def make_celery(app: Flask) -> Celery:
     return celery
 
 celery = make_celery(app)
+
+celery.conf.beat_schedule = {
+    'send-reminder-emails-daily': {
+        'task': 'send_reminder_emails',
+        'schedule': crontab(hour=16, minute=45),
+    },
+}
 
 if __name__ == '__main__':
     app.run(debug=True)

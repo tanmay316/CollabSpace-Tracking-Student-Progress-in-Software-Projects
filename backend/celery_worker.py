@@ -1,7 +1,7 @@
 from app import celery  # Import only the Celery instance
 
 @celery.task
-def send_reminder_emails():
+def send_reminder_emails(name='send_reminder_emails'):
     from flask_mail import Message
     from models import Milestones, Users
     from datetime import datetime, timedelta
