@@ -44,11 +44,31 @@ def create_milestone():
         return jsonify({"errors": errors}), 400
 
     try:
+        if not data.get("title") or not data["title"].strip():
+            return jsonify({"error": "Milestone title cannot be empty"}), 400
+        
+        existing_milestone = Milestones.query.filter_by(title=data["title"]).first()
+        if existing_milestone:
+            return jsonify({"error": "A milestone with this title already exists"}), 400
+        
+        date_issued = datetime.strptime(data["date_issued"], "%Y-%m-%d")
+        deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
+        
+        # Validate that date_issued is not in the past
+        today = datetime.now().date()
+        if date_issued.date() < today:
+            return jsonify({"error": "date_issued cannot be yesterday or any earlier day"}), 400
+        
+        # Validate that date_issued is before the deadline
+        if date_issued >= deadline:
+            return jsonify({"error": "date_issued must be earlier than deadline"}), 400
+
+        # Create and save the milestone
         new_milestone = Milestones(
             title=data["title"],
             description=data["description"],
-            date_issued=datetime.strptime(data["date_issued"], "%Y-%m-%d"),
-            deadline=datetime.strptime(data["deadline"], "%Y-%m-%d")
+            date_issued=date_issued,
+            deadline=deadline
         )
         db.session.add(new_milestone)
         db.session.commit()
@@ -87,12 +107,39 @@ def update_milestone(milestone_id):
         return jsonify({"error": "Milestone not found"}), 404
 
     data = request.get_json()
-    milestone.title = data.get("title", milestone.title)
-    milestone.description = data.get("description", milestone.description)
+    
+    # Validate title
+    if "title" in data:
+        if not data["title"].strip():
+            return jsonify({"error": "Milestone title cannot be empty"}), 400
+        
+        # Check if milestone title already exists and it's not the same milestone being updated
+        existing_milestone = Milestones.query.filter_by(title=data["title"]).first()
+        if existing_milestone and existing_milestone.id != milestone.id:
+            return jsonify({"error": "A milestone with this title already exists"}), 400
+
+        milestone.title = data["title"].strip()
+
+    # Update description
+    if "description" in data:
+        milestone.description = data["description"].strip()
+
+    # Parse and validate dates
     if "date_issued" in data:
-        milestone.date_issued = datetime.strptime(data["date_issued"], "%Y-%m-%d")
+        date_issued = datetime.strptime(data["date_issued"], "%Y-%m-%d")
+        today = datetime.now().date()
+        if date_issued.date() < today:
+            return jsonify({"error": "date_issued cannot be yesterday or any earlier day"}), 400
+        milestone.date_issued = date_issued
+
     if "deadline" in data:
-        milestone.deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
+        deadline = datetime.strptime(data["deadline"], "%Y-%m-%d")
+        milestone.deadline = deadline
+
+    # Ensure that date_issued is before deadline (if both are set)
+    if milestone.date_issued and milestone.deadline:
+        if milestone.date_issued >= milestone.deadline:
+            return jsonify({"error": "date_issued must be earlier than deadline"}), 400
 
     try:
         db.session.commit()
