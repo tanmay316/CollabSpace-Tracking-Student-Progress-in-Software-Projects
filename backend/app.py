@@ -5,7 +5,9 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from datetime import datetime
 import os
-
+from flask_mail import Mail, Message
+from celery.schedules import crontab
+from celery import Celery
 
 # Import necessary files and functions from the project
 from models import *
@@ -44,6 +46,35 @@ app.register_blueprint(pdf, url_prefix="/api/pdf")
 # JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
 jwt = JWTManager(app)
+
+app.config['MAIL_SERVER'] = 'localhost'
+app.config['MAIL_PORT'] = 1025           
+app.config['MAIL_USERNAME'] = None      
+app.config['MAIL_PASSWORD'] = None
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
+
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+def make_celery(app: Flask) -> Celery:
+    celery = Celery(
+        app.import_name,
+        broker=app.config['CELERY_BROKER_URL'],
+        backend=app.config['CELERY_RESULT_BACKEND']
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
+celery = make_celery(app)
 
 if __name__ == '__main__':
     app.run(debug=True)
