@@ -13,21 +13,25 @@
         <div class="card-content">
           <h3>{{ submission.title }}</h3>
           <p>{{ submission.description }}</p>
+          
+          <!-- Submission Link Section -->
           <div class="feedback-section">
             <input 
-              v-model="submission.feedback" 
+              v-model="submission.submission_link" 
               placeholder="Enter submission link." 
               class="link-input"
             />
-            <button @click="sendFeedback(submission.id)">Submission Link</button>
+            <button @click="sendSubmissionLink(submission)">Submit Link</button>
           </div>
+          
+          <!-- Feedback Section -->
           <div class="feedback-section">
             <input 
               v-model="submission.feedback" 
               placeholder="Enter feedback..." 
               class="feedback-input"
             />
-            <button @click="sendFeedback(submission.id)">Send Feedback</button>
+            <button @click="sendFeedback(submission)">Send Feedback</button>
           </div>
         </div>
       </div>
@@ -37,33 +41,71 @@
 
 <script setup>
 import { ref } from 'vue';
+import axios from 'axios'; // Ensure axios is installed and imported
 
 const submissions = ref([
   {
     id: 1,
     title: 'CRUD Operations Implementation',
     description: 'Submission includes backend and frontend integration for CRUD.',
+    submission_link: '',
     feedback: ''
   },
   {
     id: 2,
     title: 'UI Design Submission',
     description: 'Completed UI components for the dashboard.',
+    submission_link: '',
     feedback: ''
   },
   {
     id: 3,
     title: 'Testing and Debugging',
     description: 'Includes test cases and debugging report.',
+    submission_link: '',
     feedback: ''
   }
 ]);
 
-const sendFeedback = (id) => {
-  const submission = submissions.value.find((s) => s.id === id);
+const sendSubmissionLink = async (submission) => {
+  if (submission.submission_link.trim()) {
+    try {
+      const response = await axios.post(`/api/submit_milestone/${submission.id}`, {
+        student_id: getStudentId(), // Replace with actual method to get student ID
+        github_branch_link: submission.submission_link,
+        feedback: submission.feedback || '' // Optionally send feedback if available
+      });
+      
+      if (response.data.message) {
+        alert(`Submission link sent for "${submission.title}": ${submission.submission_link}`);
+        submission.submission_link = ''; // Clear submission link field after sending
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to send submission link.');
+    }
+  } else {
+    alert('Please enter a submission link before sending.');
+  }
+};
+
+const sendFeedback = async (submission) => {
   if (submission.feedback.trim()) {
-    alert(`Feedback sent for "${submission.title}": ${submission.feedback}`);
-    submission.feedback = ''; // Clear feedback field after sending
+    try {
+      const response = await axios.post(`/api/submit_milestone/${submission.id}`, {
+        student_id: getStudentId(), // Replace with actual method to get student ID
+        github_branch_link: submission.submission_link || '', // Optionally send submission link if available
+        feedback: submission.feedback
+      });
+      
+      if (response.data.message) {
+        alert(`Feedback sent for "${submission.title}": ${submission.feedback}`);
+        submission.feedback = ''; // Clear feedback field after sending
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to send feedback.');
+    }
   } else {
     alert('Please enter feedback before sending.');
   }
@@ -76,6 +118,12 @@ const getInitials = (title) => {
     .join('')
     .toUpperCase()
     .slice(0, 2);
+};
+
+// Placeholder function to get the current student's ID
+const getStudentId = () => {
+  // Implement actual logic to retrieve the logged-in student's ID
+  return 1; // Example: return 1
 };
 </script>
 
@@ -155,15 +203,10 @@ h3{
   display: flex;
   gap: 8px;
   align-items: center;
+  margin-bottom: 8px;
 }
 
-.feedback-input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #d1d5db;
-}
-
+.feedback-input,
 .link-input {
   flex: 1;
   padding: 8px;
@@ -171,7 +214,8 @@ h3{
   border: 1px solid #d1d5db;
 }
 
-.feedback-input:focus {
+.feedback-input:focus,
+.link-input:focus {
   outline: none;
   border-color: #2563eb;
 }

@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
+
 
 class Users(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -9,8 +11,7 @@ class Users(db.Model):
     email = db.Column(db.String(), nullable=False, unique=True)
     password_hash = db.Column(db.String(), nullable=False)
     role = db.Column(db.String(), nullable=False)
-    github_repo = db.Column(db.String(), nullable=True)  # only for students - use frontend validation
-    # to ensure it gets filled
+    github_repo = db.Column(db.String(), nullable=True)  # only for students
 
 
 class Milestones(db.Model):
@@ -19,18 +20,25 @@ class Milestones(db.Model):
     description = db.Column(db.String(), nullable=False)
     date_issued = db.Column(db.Date(), nullable=False)
     deadline = db.Column(db.Date(), nullable=False)
-    submissions = db.relationship('MilestoneSubmissions')
+    submissions = db.relationship("MilestoneSubmissions")
 
 
 class MilestoneSubmissions(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    milestone_id = db.Column(db.Integer(), db.ForeignKey('milestones.id'), nullable=False)
-    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
-    github_branch_link = db.Column(db.String(), nullable=False)
-    # needs to be a link - use frontend validation to ensure this
+    milestone_id = db.Column(
+        db.Integer(), db.ForeignKey("milestones.id"), nullable=False
+    )
+    student_id = db.Column(db.Integer(), db.ForeignKey("users.id"), nullable=False)
+    github_branch_link = db.Column(db.String(), nullable=False)  # This is a GitHub link
     marks = db.Column(db.Integer(), nullable=True)
-    instructor_feedback = db.Column(db.String(), nullable=True, default="No feedback required")
-    # can discuss if feedback should be compulsory
+    instructor_feedback = db.Column(
+        db.String(), nullable=True, default="No feedback required"
+    )
+    plagiarism_score = db.Column(db.Float(), nullable=True)  # Store plagiarism score
+    plagiarism_status = db.Column(db.String(), nullable=True)
+
+
+# Other models here...
 
 
 # class InstructorFeedback(db.Model):

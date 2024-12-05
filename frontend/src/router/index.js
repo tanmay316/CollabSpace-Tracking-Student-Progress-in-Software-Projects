@@ -47,7 +47,13 @@ const router = createRouter({
       path:'/chatInterface',
       name:'chatInterface',
       component: () => import('../views/ChatInterfaceView.vue')
+    },
+    {
+      path: '/plagiarism-check',
+      name: 'plagiarism-check',
+      component: () => import('../views/PlagiarismCheckView.vue')
     }
+    
   ]
 })
 

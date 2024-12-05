@@ -10,6 +10,7 @@
       <!-- <RouterLink to="/mentorship" class="nav-item">Mentorship-Sessions</RouterLink> -->
       <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink>
       <RouterLink to="/summaryai" class="nav-item">Summarizer</RouterLink>
+      <RouterLink to="/plagiarism-check" class="navbar-link">Plagiarism Check</RouterLink>
 
     </div>
   </nav>
