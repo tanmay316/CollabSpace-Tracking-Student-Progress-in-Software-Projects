@@ -170,6 +170,7 @@ export default defineComponent({
 }
 
 h1 {
+  margin-top: 30px;
   text-align: center;
   color: #333;
   margin-bottom: 20px;
