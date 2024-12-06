@@ -50,21 +50,6 @@ class MilestoneSubmissions(db.Model):
 #     feedback = db.Column(db.String(), nullable=False)
 
 
-class MentorshipSessions(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    mentor_name = db.Column(db.String(), nullable=False)
-    description = db.Column(db.String(), nullable=False)
-    price = db.Column(db.Integer(), default=200, nullable=True)
-    slot_time = db.Column(db.DateTime(), nullable=False)  
-    registrations = db.relationship('MentorshipRegistrations', backref='session', lazy=True)
-
-
-class MentorshipRegistrations(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
-    mentorship_session = db.Column(db.Integer(), db.ForeignKey('mentorship_sessions.id'), nullable=False)
-
-
 class StudentDoubts(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
@@ -79,14 +64,29 @@ class ChatbotInteractions(db.Model):
     query = db.Column(db.String(), nullable=False)
     response = db.Column(db.String(), nullable=False)
 
+class MentorshipSessionRequests(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    ta_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    requested_date = db.Column(db.DateTime, nullable=False)
+    requested_time = db.Column(db.Time, nullable=False)
+    status = db.Column(db.String(50), default="pending")  # pending, accepted, deleted
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    student = db.relationship('Users', foreign_keys=[student_id])
+    ta = db.relationship('Users', foreign_keys=[ta_id])
 
 class VivaSlots(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    time = db.Column(db.DateTime(), nullable=False)
-    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=True)
-    examiner_name = db.Column(db.String(), nullable=False)
-    status = db.Column(db.String(), default="Requested")  
-    student_request = db.Column(db.Boolean(), default=False)  
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Nullable for unbooked slots
+    ta_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    slot_date = db.Column(db.DateTime, nullable=False)
+    slot_time = db.Column(db.Time, nullable=False)
+    status = db.Column(db.String(50), default="available")  # available, booked, accepted, deleted
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    student = db.relationship('Users', foreign_keys=[student_id])
+    ta = db.relationship('Users', foreign_keys=[ta_id])
 
 # Requested by Raj
 class ProjectData(db.Model):
