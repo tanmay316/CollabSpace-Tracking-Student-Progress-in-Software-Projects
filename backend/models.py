@@ -52,10 +52,11 @@ class MilestoneSubmissions(db.Model):
 
 class MentorshipSessions(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
+    mentor_name = db.Column(db.String(), nullable=False)
     description = db.Column(db.String(), nullable=False)
     price = db.Column(db.Integer(), default=200, nullable=True)
-    mentor_name = db.Column(db.String(), nullable=False)
-    registrations = db.relationship('MentorshipRegistrations')
+    slot_time = db.Column(db.DateTime(), nullable=False)  
+    registrations = db.relationship('MentorshipRegistrations', backref='session', lazy=True)
 
 
 class MentorshipRegistrations(db.Model):
@@ -81,11 +82,11 @@ class ChatbotInteractions(db.Model):
 
 class VivaSlots(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    time = db.Column(db.Date(), nullable=False)
-    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    time = db.Column(db.DateTime(), nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=True)
     examiner_name = db.Column(db.String(), nullable=False)
-    status = db.Column(db.Boolean(), nullable=True)  # pass or fail status - will be updated after viva is over
-
+    status = db.Column(db.String(), default="Requested")  
+    student_request = db.Column(db.Boolean(), default=False)  
 
 # Requested by Raj
 class ProjectData(db.Model):
