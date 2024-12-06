@@ -63,67 +63,135 @@ def send_message():
     # db.session.commit()
     return jsonify({'message': 'Message sent successfully'}), 201
 
-# pending: student id?
-# time: dynamic
-@ta.route('/api/viva_slots', methods=['POST'])
-def create_viva_slot():
-    import datetime
-    x = datetime.datetime.now()
-    data = request.get_json()
-    try:
-        viva_slot = VivaSlots(
-            time=x,
-            # time=data['time'],
-            # student_id=data['student_id'],
-            student_id='None',
-            examiner_name=data['examiner_name'],
-            # examiner_name='None',
-            status=False
-        )
-        db.session.add(viva_slot)
-        db.session.commit()
-        return jsonify({"message": "Viva slot created successfully."}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+# # pending: student id?
+# # time: dynamic
+# @ta.route('/api/viva_slots', methods=['POST'])
+# def create_viva_slot():
+#     import datetime
+#     x = datetime.datetime.now()
+#     data = request.get_json()
+#     try:
+#         viva_slot = VivaSlots(
+#             time=x,
+#             # time=data['time'],
+#             # student_id=data['student_id'],
+#             student_id='None',
+#             examiner_name=data['examiner_name'],
+#             # examiner_name='None',
+#             status=False
+#         )
+#         db.session.add(viva_slot)
+#         db.session.commit()
+#         return jsonify({"message": "Viva slot created successfully."}), 201
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 400
 
 
-@ta.route('/api/viva_slots', methods=['GET'])
-def fetch_viva_slots():
+# @ta.route('/api/viva_slots', methods=['GET'])
+# def fetch_viva_slots():
+#     slots = VivaSlots.query.all()
+#     result = [{"id": slot.id, "time": slot.time, "student_id": slot.student_id,
+#                "examiner_name": slot.examiner_name, "status": slot.status} for slot in slots]
+#     return jsonify(result)
+
+
+# @ta.route('/api/viva_slots/<int:slot_id>', methods=['POST'])
+# def update_viva_slot(slot_id):
+#     data = request.get_json()
+#     try:
+#         viva_slot = VivaSlots.query.get(slot_id)
+#         if viva_slot:
+#             viva_slot.time = data.get('time', viva_slot.time)
+#             viva_slot.status = data.get('status', viva_slot.status)
+#             viva_slot.examiner_name = data.get('examiner_name', viva_slot.examiner_name)
+#             db.session.commit()
+#             return jsonify({"message": "Viva slot updated successfully."})
+#         else:
+#             return jsonify({"error": "Viva slot not found."}), 404
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 400
+
+
+# @ta.route('/api/viva_slots/<int:slot_id>', methods=['DELETE'])
+# def delete_viva_slot(slot_id):
+#     try:
+#         viva_slot = VivaSlots.query.get(slot_id)
+#         if viva_slot:
+#             db.session.delete(viva_slot)
+#             db.session.commit()
+#             return jsonify({"message": "Viva slot deleted successfully."})
+#         else:
+#             return jsonify({"error": "Viva slot not found."}), 404
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 400
+
+@ta.route('/mentorship_session/view', methods=['GET'])
+def view_mentorship_requests():
+    requests = MentorshipSessionRequests.query.filter_by(status="pending").all()
+    result = [{
+        "id": req.id,
+        "student_id": req.student_id,
+        "requested_date": req.requested_date.strftime("%Y-%m-%d"),
+        "requested_time": req.requested_time.strftime("%H:%M"),
+        "status": req.status
+    } for req in requests]
+    return jsonify({"requests": result}), 200
+
+@ta.route('/mentorship_session/accept/<int:request_id>', methods=['PUT'])
+def accept_mentorship_request(request_id):
+    session_request = MentorshipSessionRequests.query.get(request_id)
+
+    if not session_request:
+        return jsonify({"error": "Request not found"}), 404
+
+    session_request.status = "accepted"
+    db.session.commit()
+    return jsonify({"message": "Mentorship session accepted."}), 200
+
+@ta.route('/mentorship_session/delete/<int:request_id>', methods=['DELETE'])
+def delete_mentorship_request(request_id):
+    session_request = MentorshipSessionRequests.query.get(request_id)
+
+    if not session_request:
+        return jsonify({"error": "Request not found"}), 404
+
+    session_request.status = "deleted"
+    db.session.commit()
+    return jsonify({"message": "Mentorship session deleted."}), 200
+
+@ta.route('/viva_slots/view', methods=['GET'])
+def view_viva_slots():
     slots = VivaSlots.query.all()
-    result = [{"id": slot.id, "time": slot.time, "student_id": slot.student_id,
-               "examiner_name": slot.examiner_name, "status": slot.status} for slot in slots]
-    return jsonify(result)
+    result = [{
+        "id": slot.id,
+        "student_id": slot.student_id,
+        "slot_date": slot.slot_date.strftime("%Y-%m-%d"),
+        "slot_time": slot.slot_time.strftime("%H:%M"),
+        "status": slot.status
+    } for slot in slots]
+    return jsonify({"slots": result}), 200
 
+@ta.route('/viva_slots/accept/<int:slot_id>', methods=['PUT'])
+def accept_viva_slot(slot_id):
+    viva_slot = VivaSlots.query.get(slot_id)
 
-@ta.route('/api/viva_slots/<int:slot_id>', methods=['POST'])
-def update_viva_slot(slot_id):
-    data = request.get_json()
-    try:
-        viva_slot = VivaSlots.query.get(slot_id)
-        if viva_slot:
-            viva_slot.time = data.get('time', viva_slot.time)
-            viva_slot.status = data.get('status', viva_slot.status)
-            viva_slot.examiner_name = data.get('examiner_name', viva_slot.examiner_name)
-            db.session.commit()
-            return jsonify({"message": "Viva slot updated successfully."})
-        else:
-            return jsonify({"error": "Viva slot not found."}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+    if not viva_slot or viva_slot.status != "booked":
+        return jsonify({"error": "Slot not found or not booked"}), 404
 
+    viva_slot.status = "accepted"
+    db.session.commit()
+    return jsonify({"message": "Viva slot accepted."}), 200
 
-@ta.route('/api/viva_slots/<int:slot_id>', methods=['DELETE'])
+@ta.route('/viva_slots/delete/<int:slot_id>', methods=['DELETE'])
 def delete_viva_slot(slot_id):
-    try:
-        viva_slot = VivaSlots.query.get(slot_id)
-        if viva_slot:
-            db.session.delete(viva_slot)
-            db.session.commit()
-            return jsonify({"message": "Viva slot deleted successfully."})
-        else:
-            return jsonify({"error": "Viva slot not found."}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+    viva_slot = VivaSlots.query.get(slot_id)
+
+    if not viva_slot:
+        return jsonify({"error": "Slot not found"}), 404
+
+    viva_slot.status = "deleted"
+    db.session.commit()
+    return jsonify({"message": "Viva slot deleted."}), 200
 
 ##############plag##################################################################################
 
