@@ -6,9 +6,20 @@ from urllib.parse import urlparse
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from Levenshtein import distance as levenshtein_distance
+from models import Users, MilestoneSubmissions
+import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  
 
 from routes.authentication import *
 ta = Blueprint("ta", __name__)
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env
 
 
 @ta.route('/api/doubts', methods=['GET'])
@@ -196,61 +207,108 @@ def delete_viva_slot(slot_id):
 ##############plag##################################################################################
 
 
+import requests
+from urllib.parse import urlparse
+import os
+
+supported_extensions = {".py", ".java", ".c", ".cpp", ".js", ".ts", ".html", ".css",".txt",""}
+
+
+def has_supported_extension(filename):
+    _, ext = os.path.splitext(filename)
+    return ext.lower() in supported_extensions
+
+
 def fetch_github_code(repo_url):
     try:
         # Extract the username and repo name from the GitHub URL
         parsed_url = urlparse(repo_url)
         path_parts = parsed_url.path.strip("/").split("/")
         if len(path_parts) < 2:
+            print("Invalid GitHub URL format.")
             return None  # Invalid URL format
         user, repo = path_parts[:2]
 
         # GitHub API to fetch the content of the repository files
         api_url = f"https://api.github.com/repos/{user}/{repo}/contents"
         headers = {
-            "Accept": "application/vnd.github.v3.raw"
-            # 'Authorization': 'token YOUR_PERSONAL_ACCESS_TOKEN'  # Optional: Use if rate limits are an issue
+            "Accept": "application/vnd.github.v3.raw",
+            "Authorization": f"token {os.getenv('GITHUB_TOKEN')}",
         }
+
+        # Check if the token is loaded
+        if not headers["Authorization"]:
+            print(
+                "GitHub token is not set. Please set the GITHUB_TOKEN environment variable."
+            )
+            return None
+
         response = requests.get(api_url, headers=headers)
+        print(f"GET {api_url} - Status Code: {response.status_code}")
 
         if response.status_code == 200:
             contents = response.json()
             files_content = []
-            for file in contents:
-                if file["type"] == "file" and file["name"].endswith(
-                    (".py", ".java", ".c", ".cpp", ".js", ".ts", ".html", ".css")
-                ):
-                    file_response = requests.get(file["download_url"])
-                    if file_response.status_code == 200:
-                        files_content.append(file_response.text)
-            return "\n".join(
-                files_content
-            )  # Return the combined code as a single string
+            total_files = 0
+            supported_files = 0
+
+            def fetch_contents(items):
+                nonlocal total_files, supported_files
+                for item in items:
+                    total_files += 1
+                    if item["type"] == "file":
+                        print(f"Found file: {item['path']}")
+                        if has_supported_extension(item["name"]):
+                            supported_files += 1
+                            print(f"Fetching supported file: {item['path']}")
+                            file_response = requests.get(
+                                item["download_url"], headers=headers
+                            )
+                            print(
+                                f"GET {item['download_url']} - Status Code: {file_response.status_code}"
+                            )
+                            if file_response.status_code == 200:
+                                files_content.append(file_response.text)
+                            else:
+                                print(
+                                    f"Failed to fetch file {item['path']}: {file_response.status_code}"
+                                )
+                        else:
+                            print(f"Ignored unsupported file: {item['path']}")
+                    elif item["type"] == "dir":
+                        print(f"Entering directory: {item['path']}")
+                        subdir_api_url = item["url"]
+                        subdir_response = requests.get(subdir_api_url, headers=headers)
+                        print(
+                            f"GET {subdir_api_url} - Status Code: {subdir_response.status_code}"
+                        )
+                        if subdir_response.status_code == 200:
+                            subdir_contents = subdir_response.json()
+                            fetch_contents(subdir_contents)  # Recursive call
+                        else:
+                            print(
+                                f"Failed to fetch subdirectory {item['path']}: {subdir_response.status_code}"
+                            )
+
+            fetch_contents(contents)
+            combined_code = "\n".join(files_content)
+            print(f"Total files found: {total_files}")
+            print(f"Supported files fetched: {supported_files}")
+            print(f"Fetched total code length: {len(combined_code)} characters.")
+            return combined_code
+        elif response.status_code == 403:
+            # Possibly rate limited or forbidden
+            error_message = response.json().get("message", "Forbidden")
+            print(
+                f"Failed to fetch repo contents: {response.status_code} - {error_message}"
+            )
+            return None
         else:
             print(f"Failed to fetch repo contents: {response.status_code}")
             return None
     except Exception as e:
         print(f"Error fetching GitHub code: {e}")
         return None
-
-
-# Function to compare two pieces of code
-def compare_code(code1, code2):
-    """
-    Compare two pieces of code for similarity using Levenshtein distance and Cosine similarity.
-    Returns a similarity score between 0 and 100.
-    """
-    if not code1 or not code2:
-        return 0  # If either of the code snippets is empty, return 0% similarity
-
-    # Compute similarity using both Levenshtein and Cosine Similarity
-    lev_score = levenshtein_similarity(code1, code2)
-    cosine_score = cosine_similarity(code1, code2)
-
-    # Combine the scores (weighted equally)
-    final_score = (lev_score * 0.5) + (cosine_score * 0.5)
-
-    return final_score
 
 
 # Levenshtein Distance-based Similarity
@@ -264,7 +322,7 @@ def levenshtein_similarity(str1, str2):
 
 
 # Cosine Similarity-based approach
-def cosine_similarity(str1, str2):
+def cosine_similarity_score(str1, str2):
     # Use CountVectorizer to convert text to a matrix of token counts
     vectorizer = CountVectorizer().fit_transform([str1, str2])
     vectors = vectorizer.toarray()
@@ -276,59 +334,117 @@ def cosine_similarity(str1, str2):
     return cosine_score * 100  # Return as percentage
 
 
-@ta.route("/api/check_plagiarism", methods=["POST"])
-def check_plagiarism():
-    data = request.get_json()
+def compare_code(code1, code2):
+    """
+    Compare two pieces of code for similarity using Levenshtein distance and Cosine similarity.
+    Returns a similarity score between 0 and 100.
+    """
+    if not code1 or not code2:
+        print("One of the code snippets is empty.")
+        return 0  # If either of the code snippets is empty, return 0% similarity
 
-    if not data or "github_repo_link" not in data or "student_name" not in data:
+    # Compute similarity using both Levenshtein and Cosine Similarity
+    lev_score = levenshtein_similarity(code1, code2)
+    print(f"Levenshtein similarity: {lev_score}")
+    cosine_score = cosine_similarity_score(code1, code2)
+    print(f"Cosine similarity: {cosine_score}")
+
+    # Combine the scores (weighted equally)
+    final_score = (lev_score * 0.5) + (cosine_score * 0.5)
+    print(f"Final similarity score: {final_score}")
+
+    return final_score
+
+
+@ta.route("/get_students", methods=["GET"])
+def get_students():
+    print("Fetching students from the database...")
+    students = Users.query.filter_by(role="student").all()
+    if not students:
+        print("No students found in the database.")
+    else:
+        print(f"Found {len(students)} students.")
+    student_list = [
+        {
+            "id": student.id,
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+        }
+        for student in students
+    ]
+    return jsonify(student_list), 200
+
+
+@ta.route("/check_plagiarism", methods=["POST"])
+def check_plagiarism():
+    print("Received plagiarism check request")
+    data = request.get_json()
+    print(f"Request data: {data}")
+
+    if not data or "github_repo_link" not in data or "student_id" not in data:
+        print("Missing required fields")
         return (
-            jsonify({"error": "GitHub repository link and student name are required"}),
+            jsonify({"error": "GitHub repository link and student ID are required"}),
             400,
         )
 
     new_repo_url = data["github_repo_link"]
-    student_name = data["student_name"]
+    student_id = data["student_id"]
 
+    print(f"Fetching code for repository: {new_repo_url}")
     new_repo_code = fetch_github_code(new_repo_url)
 
-    if new_repo_code is None:
+    if new_repo_code is None or new_repo_code.strip() == "":
+        print("Failed to fetch new repository code or code is empty")
         return (
             jsonify(
-                {
-                    "error": "Unable to fetch repository data from GitHub. Please check the repository link."
-                }
+                {"error": "Unable to fetch repository data or repository is empty."}
             ),
             500,
         )
 
+    print(f"New repository code length: {len(new_repo_code)} characters")
+
     # Fetch all other student repository links from the database
-    other_submissions = MilestoneSubmissions.query.join(
-        Users, MilestoneSubmissions.student_id == Users.id
+    print(f"Fetching submissions excluding student ID: {student_id}")
+    other_submissions = MilestoneSubmissions.query.filter(
+        MilestoneSubmissions.student_id != student_id
     ).all()
+    print(f"Found {len(other_submissions)} other submissions")
+
     plagiarism_results = []
     total_score = 0
     comparison_count = 0
 
     for submission in other_submissions:
+        print(
+            f"Processing submission ID: {submission.id} with repo link: {submission.github_branch_link}"
+        )
+
+        # **Check if the other submission has the same repo link**
         if submission.github_branch_link == new_repo_url:
-            continue  # Skip comparing the same repository
+            print("Identical repository found. Assigning 100% similarity.")
+            score = 100.0
+            status = "fail"
+        else:
+            existing_repo_code = fetch_github_code(submission.github_branch_link)
+            if existing_repo_code is None or existing_repo_code.strip() == "":
+                print("Failed to fetch existing repository code or code is empty")
+                continue  # Skip if no valid code is found for the repository
 
-        existing_repo_code = fetch_github_code(submission.github_branch_link)
+            print(
+                f"Existing repository code length: {len(existing_repo_code)} characters"
+            )
 
-        if existing_repo_code is None:
-            continue  # Skip if no valid code is found for the repository
+            # Compare the new submission with the existing submission
+            print("Comparing code...")
+            score = compare_code(new_repo_code, existing_repo_code)
+            print(f"Similarity score: {score}")
+            status = "fail" if score >= 30 else "pass"
 
-        # Compare the new submission with the existing submission
-        score = compare_code(new_repo_code, existing_repo_code)
         total_score += score
         comparison_count += 1
 
-        # Store the result with a pass/fail status (e.g., fail if score >= 30%)
-        status = (
-            "fail" if score >= 30 else "pass"
-        )  # Set threshold (e.g., 30% similarity threshold)
-
-        # Fetch the student name from the Users table
         student = Users.query.get(submission.student_id)
         student_full_name = (
             f"{student.first_name} {student.last_name}" if student else "Unknown"
@@ -343,7 +459,25 @@ def check_plagiarism():
             }
         )
 
+        # **Update the submission with the plagiarism score and status**
+        submission.plagiarism_score = score
+        submission.plagiarism_status = status
+
+    # Calculate overall score
     overall_score = (total_score / comparison_count) if comparison_count > 0 else 0
+    print(f"Overall plagiarism score: {overall_score}")
+
+    # **Commit the changes to the database**
+    try:
+        db.session.commit()
+        print("Plagiarism scores updated in the database.")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error saving plagiarism scores to the database: {e}")
+        return (
+            jsonify({"error": "Failed to save plagiarism scores to the database."}),
+            500,
+        )
 
     return (
         jsonify(

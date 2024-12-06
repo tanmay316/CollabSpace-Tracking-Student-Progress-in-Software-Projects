@@ -1,7 +1,7 @@
 <template>
-  <div class="container">
+  <div>
     <div class="sidebar">
-      <h1>Ai Chatbot</h1>
+      <h1>AI Chatbot</h1>
       <form @submit.prevent="handleSubmit">
         <label for="repolink">GitHub Repo Link:</label>
         <input type="text" v-model="repolink" placeholder="Enter GitHub Repo Link" />
@@ -15,26 +15,30 @@
     </div>
 
     <div class="main-content">
-      <h2 style="color: black;">Query wrt Context</h2>
-      <div class="chat-section" ref="chatBox">
-        <p v-for="(msg, index) in chatMessages" :key="index">
-          <strong>{{ msg.role }}:</strong> {{ msg.content }}
-        </p>
-      </div>
-      <div class="chat-input">
-        <input type="text" v-model="userMessage" placeholder="Ask about Repo or Files..." />
-        <button @click="sendMessage">Ask</button>
+      <div class="chat-section-container">
+        <h2>Query wrt Context</h2>
+        <div class="chat-section" ref="chatBox">
+          <p v-for="(msg, index) in chatMessages" :key="index" :class="msg.role">
+            <strong>{{ msg.role }}:</strong> {{ msg.content }}
+          </p>
+        </div>
+        <div class="chat-input">
+          <input type="text" v-model="userMessage" placeholder="Ask about Repo or Files..." />
+          <button @click="sendMessage">Ask</button>
+        </div>
       </div>
 
-      <h2 style="color: black;">Talk 2 Ai</h2>
-      <div class="chat-section" ref="directChatBox">
-        <p v-for="(msg, index) in directMessages" :key="index">
-          <strong>{{ msg.role }}:</strong> {{ msg.content }}
-        </p>
-      </div>
-      <div class="chat-input">
-        <input type="text" v-model="directMessage" placeholder="Chat directly with AI..." />
-        <button @click="sendDirectMessage">Ask</button>
+      <div class="chat-section-container">
+        <h2>Talk to AI</h2>
+        <div class="chat-section" ref="directChatBox">
+          <p v-for="(msg, index) in directMessages" :key="index" :class="msg.role">
+            <strong>{{ msg.role }}:</strong> {{ msg.content }}
+          </p>
+        </div>
+        <div class="chat-input">
+          <input type="text" v-model="directMessage" placeholder="Chat directly with AI..." />
+          <button @click="sendDirectMessage">Ask</button>
+        </div>
       </div>
     </div>
   </div>
@@ -144,112 +148,298 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  gap: 0.5rem;
-  background-color: #f3f4f6;
-  height: calc(100vh - 60px);
-  margin: 5rem;
-  padding: 2rem;
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Sidebar Styling */
 .sidebar {
-  width: 300px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  margin: 50px auto 0 auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 350px;
+  /* Increased width of the sidebar */
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 30px 25px;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  border-radius: 0.5rem;
-}
-
-.h1{
-  color: gray;
-  font-weight: bold;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  transition: all 0.3s ease;
 }
 
 .sidebar h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .sidebar label {
   display: block;
-  margin-top: 10px;
-  font-weight: bold;
+  margin-top: 20px;
+  font-weight: 500;
+  font-size: 1rem;
 }
 
 .sidebar input[type="text"],
 .sidebar input[type="file"] {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
+  padding: 12px 15px;
+  margin-top: 8px;
   border: none;
-  border-radius: 5px;
-  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.95rem;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.sidebar input[type="text"]::placeholder,
+.sidebar input[type="file"]::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sidebar input[type="text"]:focus,
+.sidebar input[type="file"]:focus {
+  background-color: rgba(255, 255, 255, 0.3);
+  outline: none;
+  transform: scale(1.02);
 }
 
 .sidebar button {
   width: 100%;
-  background-color: #3498db;
-  color: white;
-  padding: 10px;
+  margin-top: 25px;
+  padding: 12px;
+  background-color: #ff7e5f;
+  background-image: linear-gradient(45deg, #ff7e5f, #feb47b);
+  color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar button:hover {
-  background-color: #2980b9;
+  background-image: linear-gradient(45deg, #feb47b, #ff7e5f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Status Message */
+.status {
+  margin-top: 20px;
+  font-style: italic;
+  color: #d1d8e0;
+  text-align: center;
+}
+
+/* Main Content Styling */
 .main-content {
-  flex-grow: 1;
+  margin: 50px auto 0 auto;
+  margin-left: 350px;
+  padding: 30px 20px;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  padding: 10px;
-  overflow-y: auto;
+  gap: 50px;
+  transition: margin-left 0.3s ease;
+}
+
+.chat-section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-section-container h2 {
+  font-size: 1.6rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .chat-section {
   flex-grow: 1;
-  border: 1px solid #0b0a0a;
-  border-radius: 5px;
-  padding: 10px;
-  background-color: darkgrey;
+  border: 1px solid #ecf0f1;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #f9f9fb;
   overflow-y: auto;
-  max-height: 200px;
-  margin-bottom: 10px;
+  max-height: 600px;
+  /* Increased max-height for larger display */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s;
+}
+
+.chat-section:hover {
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chat-section p {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.chat-section p.You {
+  text-align: right;
+}
+
+.chat-section p.Assistant,
+.chat-section p.AI {
+  text-align: left;
+}
+
+.chat-section p strong {
+  color: #34495e;
 }
 
 .chat-input {
   display: flex;
-  gap: 10px;
+  gap: 15px;
 }
 
 .chat-input input {
   flex-grow: 1;
-  padding: 10px;
+  padding: 12px 15px;
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.chat-input input::placeholder {
+  color: #95a5a6;
+}
+
+.chat-input input:focus {
+  border-color: #3498db;
+  outline: none;
+  transform: scale(1.02);
 }
 
 .chat-input button {
-  background-color: #3498db;
-  color: white;
+  padding: 12px 20px;
+  background-color: #1abc9c;
+  background-image: linear-gradient(45deg, #1abc9c, #16a085);
+  color: #ffffff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .chat-input button:hover {
-  background-color: #2980b9;
+  background-image: linear-gradient(45deg, #16a085, #1abc9c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.status {
-  margin-bottom: 10px;
-  font-style: italic;
-  color: #888;
+/* Message Roles */
+.You {
+  color: #1abc9c;
+}
+
+.Assistant,
+.AI {
+  color: #3498db;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    top: auto;
+    left: auto;
+    bottom: auto;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .chat-section {
+    max-height: 500px;
+    /* Adjusted for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    padding: 25px 20px;
+  }
+
+  .sidebar h1 {
+    font-size: 1.8rem;
+  }
+
+  .sidebar label {
+    font-size: 0.95rem;
+  }
+
+  .sidebar input[type="text"],
+  .sidebar input[type="file"] {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .sidebar button {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+
+  .main-content {
+    padding: 15px;
+    gap: 30px;
+  }
+
+  .chat-section {
+    max-height: 400px;
+    /* Further adjusted for mobile */
+  }
+
+  .chat-section-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .chat-input input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .chat-input button {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
 }
 </style>
