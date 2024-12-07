@@ -61,7 +61,6 @@
                 <div class="slot-container">
                   <div class="slot-block2">
                     <input class="viva-date-icon" type="date">
-                    <!-- <div class="viva-icon">🧸</div> -->
                   </div>
                   <div class="slot-block1">
                     <div class="create-slot" @click="createVivaSlot()">+ Viva Slot</div>
@@ -74,7 +73,12 @@
                   <div v-else>
                     <div v-for="slot in vivaSlots" :key="slot.id" class="slot-block">
                       <div class="slot-block1">
-                        <div class="slot">{{slot.time}}</div>
+                        <div class="slot" @click="bookVivaSlot(slot.id)" v-if="slot.status === 'available'">
+                          {{ slot.slot_date }} {{ slot.slot_time }}
+                        </div>
+                        <div class="slot" v-else>
+                          {{ slot.slot_date }} {{ slot.slot_time }} ({{ slot.status }})
+                        </div>
                         <div class="viva-icon" @click="deleteVivaSlot(slot.id)">❌</div>
                       </div>
                       <div class="slot-block2">
@@ -97,8 +101,6 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 
 const milestones = ref([]);
-const loading = ref(true);
-const error = ref("");
 
 const fetchMilestones = async () => {
   try {
@@ -126,8 +128,12 @@ const getMilestoneStatus = (deadline) => {
 };
 
 const vivaSlots = ref([]);
+const loading = ref(false);
+const error = ref(null);
 
 const fetchVivaSlots = async () => {
+  loading.value = true;
+  error.value = null;
   try {
     const response = await axios.get("http://127.0.0.1:5000/api/ta/api/viva_slots");
     vivaSlots.value = response.data;
@@ -141,54 +147,76 @@ const fetchVivaSlots = async () => {
 
 const createVivaSlot = async () => {
   try {
-    const examinerName = prompt('Enter examiner name for the viva slot:');
-    if (!examinerName) {
-      alert('Examiner name is required.');
+    const taId = prompt("Enter TA ID:");
+    const slotDate = prompt("Enter slot date (YYYY-MM-DD):");
+    const slotTime = prompt("Enter slot time (HH:MM:SS):");
+
+    if (!taId || !slotDate || !slotTime) {
+      alert("All fields are required.");
       return;
     }
 
-    const response = await axios.post('http://127.0.0.1:5000/api/ta/api/viva_slots', {
-      examiner_name: examinerName,
+    const response = await axios.post("http://127.0.0.1:5000/api/ta/api/viva_slots", {
+      ta_id: taId,
+      slot_date: slotDate,
+      slot_time: slotTime,
     });
     alert(response.data.message);
-
     await fetchVivaSlots();
   } catch (err) {
-    alert('Failed to create viva slot.');
+    alert("Failed to create viva slot.");
     console.error(err.response?.data || err.message);
   }
 };
 
 const updateVivaSlot = async (slot) => {
   try {
+    const slotDate = prompt("Enter new slot date (YYYY-MM-DD):", slot.slot_date);
+    const slotTime = prompt("Enter new slot time (HH:MM:SS):", slot.slot_time);
+    const status = prompt("Enter new status:", slot.status);
+
     const response = await axios.post(`http://127.0.0.1:5000/api/ta/api/viva_slots/${slot.id}`, {
-      // time: slot.time,
-      examiner_name: slot.examiner_name || 'None',
-      status: slot.status || false,
+      slot_date: slotDate,
+      slot_time: slotTime,
+      status: status,
     });
     alert(response.data.message);
     await fetchVivaSlots();
   } catch (err) {
-    alert('Failed to update viva slot.');
+    alert("Failed to update viva slot.");
     console.error(err.response?.data || err.message);
   }
 };
 
 const deleteVivaSlot = async (slotId) => {
-  if (!confirm('Are you sure you want to delete this slot?')) return;
+  if (!confirm("Are you sure you want to delete this slot?")) return;
 
   try {
     const response = await axios.delete(`http://127.0.0.1:5000/api/ta/api/viva_slots/${slotId}`);
     alert(response.data.message);
-
-    vivaSlots.value = vivaSlots.value.filter(slot => slot.id !== slotId);
+    await fetchVivaSlots();
   } catch (err) {
-    alert('Failed to delete viva slot.');
+    alert("Failed to delete viva slot.");
     console.error(err.response?.data || err.message);
   }
 };
 
-onMounted(fetchMilestones);
+const bookVivaSlot = async (slotId) => {
+  if (!confirm('Do you want to book this viva slot?')) return;
+
+  try {
+    const response = await axios.post(`http://127.0.0.1:5000/api/student/book_viva_slot/${slotId}`);
+    alert(response.data.message);
+
+    // Reload the viva slots after booking
+    await fetchVivaSlots();
+  } catch (err) {
+    alert('Failed to book viva slot.');
+    console.error(err.response?.data || err.message);
+  }
+};
+
+// onMounted(fetchMilestones);
 onMounted(fetchVivaSlots);
 </script>
   
