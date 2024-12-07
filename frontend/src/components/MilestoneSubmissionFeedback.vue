@@ -1,5 +1,6 @@
 <template>
   <div class="submission-container">
+    {{ milestoneID }}
     <div class="submission-header">Milestone Submissions</div>
     <div class="submission-grid">
       <div 
@@ -14,25 +15,36 @@
           <h3>{{ submission.title }}</h3>
           <p>{{ submission.description }}</p>
           
-          <!-- Submission Link Section -->
-          <div class="feedback-section">
-            <input 
-              v-model="submission.submission_link" 
-              placeholder="Enter submission link." 
-              class="link-input"
-            />
-            <button @click="sendSubmissionLink(submission)">Submit Link</button>
+          <div v-if="userRole === 'student'">
+            <div class="feedback-section">
+              <input 
+                v-model="submission.submission_link" 
+                placeholder="Enter submission link." 
+                class="link-input"
+              />
+              <button @click="sendSubmissionLink(submission)">Submit Link</button>
+            </div>
+            <div>
+              <!-- student shouldn't be able to edit feedback -->
+              {{ submission.feedback }}
+            </div>
           </div>
           
-          <!-- Feedback Section -->
-          <div class="feedback-section">
-            <input 
-              v-model="submission.feedback" 
-              placeholder="Enter feedback..." 
-              class="feedback-input"
-            />
-            <button @click="sendFeedback(submission)">Send Feedback</button>
-          </div>
+          <div v-if="userRole === 'instructor'">
+            <div>
+              <!-- instructor shouldn't be able to edit submission -->
+                {{ submission.submission_link }} 
+            </div>
+            <div class="feedback-section">
+              <input 
+                v-model="submission.feedback" 
+                placeholder="Enter feedback..." 
+                class="feedback-input"
+              />
+              <button @click="sendFeedback(submission)">Send Feedback</button>
+            </div>
+          </div>  
+
         </div>
       </div>
     </div>
@@ -40,8 +52,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import axios from 'axios'; // Ensure axios is installed and imported
+
+const userRole = JSON.parse(localStorage.getItem("user_info"))["role"];
+const milestoneID = ""; // need to populate it to retrieve submission(s) for that milestone alone
+
 
 const submissions = ref([
   {
