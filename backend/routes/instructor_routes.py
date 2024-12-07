@@ -186,7 +186,9 @@ def get_all_submissions(milestone_id):
             "student_id": submission.student_id,
             "github_branch_link": submission.github_branch_link,
             "marks": submission.marks,
-            "instructor_feedback": submission.instructor_feedback
+            "instructor_feedback": submission.instructor_feedback,
+            "plagiarism_status": submission.plagiarism_status,
+            "plagiarism_score": submission.plagiarism_score
         }
         for submission in submissions
     ]
