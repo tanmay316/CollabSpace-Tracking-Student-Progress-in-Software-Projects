@@ -216,7 +216,7 @@ const bookVivaSlot = async (slotId) => {
   }
 };
 
-// onMounted(fetchMilestones);
+onMounted(fetchMilestones);
 onMounted(fetchVivaSlots);
 </script>
   
