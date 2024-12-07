@@ -84,7 +84,7 @@ class VivaSlots(db.Model):
     ta_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     slot_date = db.Column(db.DateTime, nullable=False)
     slot_time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.String(50), default="available")  # available, booked, accepted, deleted
+    status = db.Column(db.String(50), default="available")  # available, booked
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     student = db.relationship('Users', foreign_keys=[student_id])
