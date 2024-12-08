@@ -4,30 +4,41 @@
       <RouterLink to="/" class="brand">CollabSpace</RouterLink>
     </div>
 
-    <!-- Navbar links (visible on larger screens) -->
     <div class="navbar-right" :class="{ active: isNavbarOpen }">
-      <RouterLink to="/login" class="nav-item">Login</RouterLink>
-      <RouterLink to="/register" class="nav-item">Register</RouterLink>
-      <RouterLink to="/" class="nav-item" @click="logout">Logout</RouterLink>
-      <RouterLink to="/chatUsers" class="nav-item">Chat</RouterLink>
-      <RouterLink to="/summaryai" class="nav-item">Summarizer</RouterLink>
-      <RouterLink to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
+      <RouterLink v-if="!isLoggedIn" to="/login" class="nav-item">Login</RouterLink>
+      <RouterLink v-if="!isLoggedIn" to="/register" class="nav-item">Register</RouterLink>
+      <RouterLink v-if="isLoggedIn" to="/" class="nav-item" @click="logout">Logout</RouterLink>
+      <RouterLink v-if="isLoggedIn" to="/chatUsers" class="nav-item">Chat</RouterLink>
+      <RouterLink v-if="role === 'instructor'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
+      <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
     </div>
 
-    <!-- Hamburger icon (only shown on small screens) -->
     <input type="checkbox" class="menu" v-model="isNavbarOpen" />
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+
+import { ref, onMounted } from 'vue';
+import { useRouter, RouterLink } from 'vue-router';
+
+const role = ref(null);
+const isLoggedIn = ref(false);
+
+onMounted(() => {
+  const userInfo = localStorage.getItem('user_info');
+  if (userInfo) {
+    const parsedInfo = JSON.parse(userInfo);
+    role.value = parsedInfo.role;
+    isLoggedIn.value = true;
+  } else {
+    isLoggedIn.value = false;
+  }
+});
 
 const router = useRouter();
 const isNavbarOpen = ref(false); // Reactive state to track navbar visibility
 
-// Handle user logout
 const logout = async () => {
   try {
     const response = await axios.post("http://127.0.0.1:5000/api/auth/logout", {}, {
@@ -38,6 +49,7 @@ const logout = async () => {
 
     alert(response.data.message || "Logged out successfully!");
 
+    role.value = null;
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_info");
 
@@ -50,7 +62,6 @@ const logout = async () => {
 </script>
 
 <style scoped>
-/* Navbar styling */
 .navbar {
   position: fixed;
   top: 0;
