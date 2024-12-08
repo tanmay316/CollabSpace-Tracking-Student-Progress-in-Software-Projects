@@ -12,8 +12,11 @@ class Users(db.Model):
     password_hash = db.Column(db.String(), nullable=False)
     role = db.Column(db.String(), nullable=False)
     github_repo = db.Column(db.String(), nullable=True)  # only for students
-    messages_sent = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender', lazy=True)
-    messages_received = db.relationship('Message', foreign_keys='Message.receiver_id', backref='receiver', lazy=True)
+    
+    # Relationships
+    messages_sent = db.relationship('Messages', foreign_keys='Messages.sender_id', backref='sender', lazy=True)
+    messages_received = db.relationship('Messages', foreign_keys='Messages.receiver_id', backref='receiver', lazy=True)
+
 
 class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +25,7 @@ class Messages(db.Model):
     message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     read = db.Column(db.Boolean, default=False)
+
 
 class Conversations(db.Model):
     id = db.Column(db.Integer, primary_key=True)

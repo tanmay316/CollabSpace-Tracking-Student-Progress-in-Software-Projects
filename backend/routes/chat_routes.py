@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from models import db, User, Conversation, Message
+from models import db, Users, Conversations, Messages
 
-chat = Blueprint('chat', __name__)
+chat = Blueprint("chat", __name__)
 
 @chat.route('/conversations/<int:user_id>', methods=['GET'])
 def get_conversations(user_id):
