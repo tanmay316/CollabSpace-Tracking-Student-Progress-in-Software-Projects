@@ -2,7 +2,7 @@
     <div class="container">
       <div class="header">Milestones</div>
       <div class="content">
-        <div class="create-container">
+        <div v-if="role === 'instructor'" class="create-container">
           <div class="card-header">
             <h3>Title: </h3>
             <input type="text" v-model="milestone.title" />
@@ -47,7 +47,7 @@
                   {{ milestone.status }}
                 </span>
 
-                <div class="mile-icon" @click="deleteMilestone(milestone.id)">❌</div>
+                <div v-if="role === 'instructor'" class="mile-icon" @click="deleteMilestone(milestone.id)">❌</div>
 
               </div>
             </div>
@@ -56,7 +56,7 @@
               <p color="cyan">{{ milestone.date_issued }}</p>
               <p color="pink">{{ milestone.deadline }}</p>
             </div>
-            <div class="edit-body">
+            <div v-if="role === 'instructor'" class="edit-body">
               <div class="edits">
                 <p>Title:</p>
                 <input type="text" v-model="editedMilestone.title" />
@@ -77,7 +77,23 @@
   
   <script setup>
   import axios from "axios";
-  import { ref } from "vue";
+  import { ref, onMounted } from 'vue';
+  import { RouterLink } from 'vue-router';
+
+  const role = ref(null);
+  const isLoggedIn = ref(false);
+
+  onMounted(() => {
+    const userInfo = localStorage.getItem('user_info');
+    if (userInfo) {
+      const parsedInfo = JSON.parse(userInfo);
+      role.value = parsedInfo.role;
+      isLoggedIn.value = true;
+    } else {
+      isLoggedIn.value = false;
+    }
+  });
+  // #########
 
   const milestone = ref({
     title: "",

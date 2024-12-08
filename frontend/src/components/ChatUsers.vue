@@ -9,7 +9,6 @@
           <p class="user-name">{{ user.name }}</p>
           <p class="user-last-msg">{{ user.lastMessage || 'No messages yet' }}</p>
         </div>
-        <div class="user-status" :class="user.status"></div>
       </li>
     </ul>
   </div>
@@ -101,13 +100,5 @@ ul {
 .user-last-msg {
   color: gray;
   font-size: 0.9rem;
-}
-
-.user-status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #00ff00;
-  /* Example, adjust based on status */
 }
 </style>
