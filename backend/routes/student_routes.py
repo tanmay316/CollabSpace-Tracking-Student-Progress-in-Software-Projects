@@ -146,22 +146,34 @@ def get_all_milestones():
 #     return jsonify(result)
 
 
-# #pending
-# #  book_viva_slots()
-# @student.route('/book_viva_slot', methods=['POST'])
-# def book_viva_slot():
-#     vivaSlot = VivaSlots.query.get(id)
-#     if not vivaSlot:
-#         return jsonify({
-#             "message": "viva slot doesn't exist"
-#         }), 404
+@student.route('/book_viva_slot/<int:slot_id>', methods=['POST'])
+# @jwt_required()  # Assuming JWT authentication to identify the student
+def book_viva_slot(slot_id):
+    try:
+        # Get the current student ID from the JWT
+        student_id = 1
+        # student_id = get_jwt_identity()
 
-#     if vivaSlot:
-#         vivaSlot.status = true
+        # Find the slot by ID
+        viva_slot = VivaSlots.query.get(slot_id)
 
-#     db.session.commit()
-#     return jsonify({"message": "Viva slot booked successfully."}), 201
+        if not viva_slot:
+            return jsonify({"error": "Viva slot not found."}), 404
+        
+        if viva_slot.status != "available":
+            return jsonify({"error": "This slot is already booked."}), 400
+        
+        # Update slot details
+        viva_slot.student_id = student_id
+        viva_slot.status = "booked"
+        viva_slot.updated_at = datetime.utcnow()
 
+        db.session.commit()
+
+        return jsonify({"message": "Viva slot booked successfully."}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 # # make_milestone_submissions() -> rag, submit()
 
@@ -180,71 +192,58 @@ def get_all_milestones():
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 400
 
-@student.route('/mentorship_session/request', methods=['POST'])
-def request_mentorship_session():
-    data = request.get_json()
-    session_request = MentorshipSessionRequests(
-        student_id=data['student_id'],
-        ta_id=data['ta_id'],
-        requested_date=datetime.strptime(data['requested_date'], "%Y-%m-%d"),
-        requested_time=datetime.strptime(data['requested_time'], "%H:%M").time()
-    )
-    db.session.add(session_request)
-    db.session.commit()
-    return jsonify({"message": "Mentorship session requested successfully."}), 201
+# @student.route('/mentorship_session/request', methods=['POST'])
+# def request_mentorship_session():
+#     data = request.get_json()
+#     session_request = MentorshipSessionRequests(
+#         student_id=data['student_id'],
+#         ta_id=data['ta_id'],
+#         requested_date=datetime.strptime(data['requested_date'], "%Y-%m-%d"),
+#         requested_time=datetime.strptime(data['requested_time'], "%H:%M").time()
+#     )
+#     db.session.add(session_request)
+#     db.session.commit()
+#     return jsonify({"message": "Mentorship session requested successfully."}), 201
 
-@student.route('/mentorship_session/update/<int:request_id>', methods=['PUT'])
-def update_mentorship_session(request_id):
-    data = request.get_json()
-    session_request = MentorshipSessionRequests.query.get(request_id)
+# @student.route('/mentorship_session/update/<int:request_id>', methods=['PUT'])
+# def update_mentorship_session(request_id):
+#     data = request.get_json()
+#     session_request = MentorshipSessionRequests.query.get(request_id)
 
-    if not session_request:
-        return jsonify({"error": "Request not found"}), 404
+#     if not session_request:
+#         return jsonify({"error": "Request not found"}), 404
 
-    session_request.requested_date = datetime.strptime(data['requested_date'], "%Y-%m-%d")
-    session_request.requested_time = datetime.strptime(data['requested_time'], "%H:%M").time()
-    session_request.status = "pending"
+#     session_request.requested_date = datetime.strptime(data['requested_date'], "%Y-%m-%d")
+#     session_request.requested_time = datetime.strptime(data['requested_time'], "%H:%M").time()
+#     session_request.status = "pending"
 
-    db.session.commit()
-    return jsonify({"message": "Mentorship session updated successfully."}), 200
+#     db.session.commit()
+#     return jsonify({"message": "Mentorship session updated successfully."}), 200
 
-@student.route('/mentorship_session/delete/<int:request_id>', methods=['DELETE'])
-def delete_mentorship_session(request_id):
-    session_request = MentorshipSessionRequests.query.get(request_id)
+# @student.route('/mentorship_session/delete/<int:request_id>', methods=['DELETE'])
+# def delete_mentorship_session(request_id):
+#     session_request = MentorshipSessionRequests.query.get(request_id)
 
-    if not session_request:
-        return jsonify({"error": "Request not found"}), 404
+#     if not session_request:
+#         return jsonify({"error": "Request not found"}), 404
 
-    session_request.status = "deleted"
-    db.session.commit()
-    return jsonify({"message": "Mentorship session deleted successfully."}), 200
+#     session_request.status = "deleted"
+#     db.session.commit()
+#     return jsonify({"message": "Mentorship session deleted successfully."}), 200
 
-@student.route('/viva_slot/book', methods=['POST'])
-def book_viva_slot():
-    data = request.get_json()
-    viva_slot = VivaSlots.query.get(data['slot_id'])
+# @student.route('/viva_slot/book', methods=['POST'])
+# def book_viva_slot():
+#     data = request.get_json()
+#     viva_slot = VivaSlots.query.get(data['slot_id'])
 
-    if not viva_slot or viva_slot.status != "available":
-        return jsonify({"error": "Slot not available"}), 400
+#     if not viva_slot or viva_slot.status != "available":
+#         return jsonify({"error": "Slot not available"}), 400
 
-    viva_slot.student_id = data['student_id']
-    viva_slot.status = "booked"
-    db.session.commit()
+#     viva_slot.student_id = data['student_id']
+#     viva_slot.status = "booked"
+#     db.session.commit()
 
-    return jsonify({"message": "Viva slot booked successfully."}), 201
-
-@student.route('/viva_slot/delete/<int:slot_id>', methods=['DELETE'])
-def delete_viva_slot_booking(slot_id):
-    viva_slot = VivaSlots.query.get(slot_id)
-
-    if not viva_slot or viva_slot.status != "booked":
-        return jsonify({"error": "Booking not found"}), 404
-
-    viva_slot.status = "available"
-    viva_slot.student_id = None
-    db.session.commit()
-
-    return jsonify({"message": "Viva slot booking deleted successfully."}), 200
+#     return jsonify({"message": "Viva slot booked successfully."}), 201
 
 @student.route("/submit_milestone/<int:milestone_id>/<int:student_id>", methods=["POST"])
 def submit_milestone(milestone_id, student_id):

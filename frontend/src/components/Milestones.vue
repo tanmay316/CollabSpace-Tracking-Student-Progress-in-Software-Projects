@@ -194,6 +194,10 @@
     align-items: center;
   }
 
+  p{
+    color: #4b5563;
+  }
+
   .edits{
     display: flex;
     flex-direction: column;
@@ -304,6 +308,10 @@
     font-size: 1.25rem;
     font-weight: 600;
     color: #111827;
+  }
+
+  .status-grey{
+    color: #4b5563;
   }
   
   .status-green {
