@@ -44,6 +44,7 @@ app.register_blueprint(admin, url_prefix="/api/admin")
 app.register_blueprint(auth, url_prefix="/api/auth")
 app.register_blueprint(rag, url_prefix="/api/rag")
 app.register_blueprint(pdf, url_prefix="/api/pdf")
+app.register_blueprint(chat, url_prefix="/api/chat")
 
 # JWT initializing for authentication
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
