@@ -44,9 +44,10 @@ const router = createRouter({
       component: () => import("../views/SummaryAI.vue"),
     },
     {
-      path: "/chatWindow",
+      path: '/chatWindow/:id',
       name: "chatWindow",
       component: () => import("../views/ChatWindowView.vue"),
+      props: true
     },
     {
       path: "/chatInterface",
@@ -63,6 +64,7 @@ const router = createRouter({
       name: "admin-dashboard",
       component: () => import("../views/AdminPage.vue"),
     },
+    
     
   ],
 });
