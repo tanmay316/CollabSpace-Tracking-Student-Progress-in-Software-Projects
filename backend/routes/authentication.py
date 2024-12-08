@@ -77,7 +77,7 @@ def login():
     user = Users.query.filter_by(email=email).first()
 
     if not user:
-        return jsonify({"message": f"A {role} with this email does not exist"}), 400
+        return jsonify({"message": f"A user with this email does not exist"}), 400
 
     if not check_password_hash(user.password_hash, password):
         return jsonify({"message": "Incorrect Password"}), 400

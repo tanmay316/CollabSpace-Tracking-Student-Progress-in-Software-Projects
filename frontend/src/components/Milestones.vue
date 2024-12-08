@@ -36,12 +36,19 @@
             }"
           >
             <div class="card-header">
-              <h3><RouterLink to='/submission'>{{ milestone.title }}</RouterLink></h3>
+              <h3>
+                <RouterLink :to="{ name: 'submission', params: { milestoneID: milestone.id } }">
+                  {{ milestone.title }}
+                </RouterLink>
+              </h3>
+
               <div class="stats">
                 <span :class="statusClass(milestone.status)">
                   {{ milestone.status }}
                 </span>
+
                 <div class="mile-icon" @click="deleteMilestone(milestone.id)">❌</div>
+
               </div>
             </div>
             <div class="card-body">

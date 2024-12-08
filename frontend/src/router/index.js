@@ -24,7 +24,7 @@ const router = createRouter({
       component: () => import("../views/MilestoneView.vue"),
     },
     {
-      path: "/submission",
+      path: "/submission/:milestoneID",
       name: "submission",
       component: () => import("../views/MilestoneSubmissionFeedbackView.vue"),
     },

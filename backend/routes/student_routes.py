@@ -245,8 +245,8 @@ def book_viva_slot(slot_id):
 
 #     return jsonify({"message": "Viva slot booked successfully."}), 201
 
-@student.route("/submit_milestone/<int:milestone_id>", methods=["POST"])
-def submit_milestone(milestone_id):
+@student.route("/submit_milestone/<int:milestone_id>/<int:student_id>", methods=["POST"])
+def submit_milestone(milestone_id, student_id):
     """
     Allowed only once
     """
@@ -261,7 +261,7 @@ def submit_milestone(milestone_id):
     new_submission = MilestoneSubmissions(
         milestone_id=milestone_id,
         # student_id=get_jwt_identity(),
-        student_id=data['student_id'],
+        student_id=student_id,
         github_branch_link=branch_link
     )
 
@@ -273,15 +273,15 @@ def submit_milestone(milestone_id):
     }), 200
 
 
-@student.route("/get_submission/<int:milestone_id>", methods=["GET"])
-@role_required("student")
-def get_submission(milestone_id):
+@student.route("/get_submission/<int:milestone_id>/<int:student_id>", methods=["GET"])
+# @role_required("student")
+def get_submission(milestone_id, student_id):
     """
     If no submission has been made yet, the submission form should be available. If a submission has been made,
     the GitHub link, feedback and marks should be displayed. Editing milestones is not allowed
     """
-
-    submission = MilestoneSubmissions.query.filter_by(student_id=get_jwt_identity(), milestone_id=milestone_id).first()
+    # student_id = request.get_json().get("student_id")
+    submission = MilestoneSubmissions.query.filter_by(student_id=student_id, milestone_id=milestone_id).first()
     if not submission:
         return jsonify({
             "message": "No submission made yet"
