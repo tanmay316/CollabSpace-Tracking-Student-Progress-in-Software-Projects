@@ -218,14 +218,11 @@ def submit_milestone(milestone_id, student_id):
     }), 200
 
 
-@student.route("/get_submission/<int:milestone_id>/<int:student_id>", methods=["GET"])
+@student.route("/get_submission/<int:milestone_id>", methods=["GET"])
 # @role_required("student")
-def get_submission(milestone_id, student_id):
-    """
-    If no submission has been made yet, the submission form should be available. If a submission has been made,
-    the GitHub link, feedback and marks should be displayed. Editing milestones is not allowed
-    """
+def get_submission(milestone_id):
     # student_id = request.get_json().get("student_id")
+    student_id = 1
     submission = MilestoneSubmissions.query.filter_by(student_id=student_id, milestone_id=milestone_id).first()
     if not submission:
         return jsonify({
