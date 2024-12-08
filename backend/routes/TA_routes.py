@@ -142,61 +142,44 @@ def delete_viva_slot(slot_id):
         db.session.commit()
         return jsonify({"message": "Viva slot deleted successfully."}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 400           
 
-################################################################################################
+# @ta.route('/mentorship_session/view', methods=['GET'])
+# def view_mentorship_requests():
+#     requests = MentorshipSessionRequests.query.filter_by(status="pending").all()
+#     result = [{
+#         "id": req.id,
+#         "student_id": req.student_id,
+#         "requested_date": req.requested_date.strftime("%Y-%m-%d"),
+#         "requested_time": req.requested_time.strftime("%H:%M"),
+#         "status": req.status
+#     } for req in requests]
+#     return jsonify({"requests": result}), 200
 
-@ta.route('/mentorship_sessions', methods=['POST'])
-def create_mentorship_session():
-    data = request.json
-    try:
-        new_session = MentorshipSession(
-            title=data['title'],
-            mentor_id=data['sessioncreator_id'],  # ID of the TA/Instructor creating the session
-            description=data['description'],
-            price=data['price']
-        )
-        db.session.add(new_session)
-        db.session.commit()
-        return jsonify({"message": "Mentorship session created successfully."}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+# @ta.route('/mentorship_session/accept/<int:request_id>', methods=['PUT'])
+# def accept_mentorship_request(request_id):
+#     session_request = MentorshipSessionRequests.query.get(request_id)
 
-@ta.route('/mentorship_sessions/<int:session_id>/requests/<int:student_id>', methods=['POST'])
-def update_request_status(session_id, student_id):
-    data = request.json
-    new_status = data.get('status', 'pending')  # approved or declined
-    try:
-        request_entry = db.session.query(mentorship_requests).filter_by(session_id=session_id, student_id=student_id).first()
-        if not request_entry:
-            return jsonify({"error": "Request not found."}), 404
+#     if not session_request:
+#         return jsonify({"error": "Request not found"}), 404
 
-        if new_status not in ['approved', 'declined']:
-            return jsonify({"error": "Invalid status."}), 400
+#     session_request.status = "accepted"
+#     db.session.commit()
+#     return jsonify({"message": "Mentorship session accepted."}), 200
 
-        # Update the request status
-        request_entry.status = new_status
-        db.session.commit()
-        return jsonify({"message": f"Request status updated to {new_status}."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+# @ta.route('/mentorship_session/delete/<int:request_id>', methods=['DELETE'])
+# def delete_mentorship_request(request_id):
+#     session_request = MentorshipSessionRequests.query.get(request_id)
 
-@ta.route('/mentorship_sessions/<int:session_id>/requests', methods=['GET'])
-def get_session_requests(session_id):
-    try:
-        requests = db.session.query(mentorship_requests).filter_by(session_id=session_id).all()
-        result = [
-            {
-                "student_id": req.student_id,
-                "status": req.status,
-                "requested_at": req.requested_at
-            } for req in requests
-        ]
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+#     if not session_request:
+#         return jsonify({"error": "Request not found"}), 404
 
-################################################################################################
+#     session_request.status = "deleted"
+#     db.session.commit()
+#     return jsonify({"message": "Mentorship session deleted."}), 200
+
+##############plag##################################################################################
+
 
 import requests
 from urllib.parse import urlparse
@@ -406,6 +389,7 @@ def check_plagiarism():
     plagiarism_results = []
     total_score = 0
     comparison_count = 0
+    overall_status = "pass"  # Default status is 'pass' until proven otherwise
 
     for submission in other_submissions:
         print(
@@ -416,7 +400,7 @@ def check_plagiarism():
         if submission.github_branch_link == new_repo_url:
             print("Identical repository found. Assigning 100% similarity.")
             score = 100.0
-            status = "fail"
+            status = "fail"  # Identical repo should be a fail
         else:
             existing_repo_code = fetch_github_code(submission.github_branch_link)
             if existing_repo_code is None or existing_repo_code.strip() == "":
@@ -432,6 +416,10 @@ def check_plagiarism():
             score = compare_code(new_repo_code, existing_repo_code)
             print(f"Similarity score: {score}")
             status = "fail" if score >= 30 else "pass"
+
+            # If any comparison fails (score >= 30), mark the overall status as "fail"
+            if status == "fail":
+                overall_status = "fail"
 
         total_score += score
         comparison_count += 1
@@ -453,15 +441,28 @@ def check_plagiarism():
         # **Update the submission with the plagiarism score and status**
         submission.plagiarism_score = score
         submission.plagiarism_status = status
+        print(
+            f"Updated submission ID {submission.id}: score = {score}, status = {status}"
+        )
 
     # Calculate overall score
     overall_score = (total_score / comparison_count) if comparison_count > 0 else 0
     print(f"Overall plagiarism score: {overall_score}")
 
+    # **Update the student's plagiarism status (the one being checked)**
+    student_to_update = Users.query.get(student_id)
+    if student_to_update:
+        student_to_update.plagiarism_score = overall_score
+        student_to_update.plagiarism_status = overall_status
+        print(
+            f"Updated student ID {student_id}: overall_score = {overall_score}, status = {overall_status}"
+        )
+
     # **Commit the changes to the database**
     try:
+        print("Committing changes to the database...")
         db.session.commit()
-        print("Plagiarism scores updated in the database.")
+        print("Plagiarism scores and statuses updated in the database.")
     except Exception as e:
         db.session.rollback()
         print(f"Error saving plagiarism scores to the database: {e}")
