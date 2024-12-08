@@ -8,7 +8,7 @@ chat = Blueprint("chat", __name__)
 def get_conversations(user_id):
     conversations = Conversations.query.filter(
         (Conversations.user1_id == user_id) | (Conversations.user2_id == user_id)
-    ).all()
+    ).all() 
     response = []
     for conv in conversations:
         other_user_id = conv.user1_id if conv.user2_id == user_id else conv.user2_id
@@ -37,7 +37,7 @@ def send_message():
     message_text = data["message"]
 
     # Add message
-    new_message = Message(
+    new_message = Messages(
         sender_id=sender_id, receiver_id=receiver_id, message=message_text
     )
     db.session.add(new_message)

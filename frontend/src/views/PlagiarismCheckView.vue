@@ -23,20 +23,28 @@
             </button>
         </div>
 
-        <div v-if="isLoading" class="loading">
-            Checking Plagiarism, please wait...
+        <!-- Loading Students -->
+        <div v-if="isLoading && !isPlagiarismChecking" class="loading">
+            Loading Students...
         </div>
 
+        <!-- No Students Found -->
         <div v-if="!isLoading && students.length === 0" class="no-students">
             No students found. Please add students to the database.
         </div>
 
-        <!-- Loader visible during plagiarism check -->
-        <div v-if="isLoading" class="loader-container">
-            <div class="loader"></div>
+        <!-- Checking Plagiarism -->
+        <div v-if="isPlagiarismChecking" class="checking-plagiarism-container">
+            <div class="checking-message" style="text-align: center;">
+                Checking Plagiarism, please wait...
+
+            </div>
+            <div class="loader-container">
+                <div class="loader"></div>
+            </div>
         </div>
 
-
+        <!-- Plagiarism Score -->
         <div v-if="score !== null" class="score-card">
             <div class="score-circle" :style="scoreStyle">
                 <span class="score-text">{{ score.toFixed(2) }}%</span>
@@ -44,6 +52,7 @@
             <div class="score-label">Score</div>
         </div>
 
+        <!-- Plagiarism Results Table -->
         <div v-if="plagiarismResults.length > 0" class="results-table">
             <table>
                 <thead>
@@ -68,6 +77,7 @@
 </template>
 
 
+
 <script>
 import axios from 'axios';
 
@@ -77,7 +87,8 @@ export default {
             githubRepoLink: '',
             selectedStudentId: '',
             students: [],
-            isLoading: false,  // use this to control loader visibility
+            isLoading: false,  // Controls the "Loading Students..." state
+            isPlagiarismChecking: false,  // Controls the "Checking Plagiarism..." state
             score: null,
             plagiarismResults: [],
         };
@@ -99,6 +110,7 @@ export default {
     methods: {
         async fetchStudents() {
             this.isLoading = true;  // Show loader while fetching students
+            this.isPlagiarismChecking = false;  // Hide plagiarism checking loader
             try {
                 console.log("Fetching students...");
                 const response = await axios.get('http://127.0.0.1:5000/api/ta/get_students');
@@ -108,7 +120,7 @@ export default {
                 console.error('Error fetching students:', error);
                 alert('Failed to load students. Please try again later.');
             } finally {
-                this.isLoading = false;  // Hide loader after fetching students
+                this.isLoading = false;  // Hide the loader after fetching students
             }
         },
 
@@ -118,7 +130,8 @@ export default {
                 return;
             }
 
-            this.isLoading = true;  // Show loader during plagiarism check
+            this.isPlagiarismChecking = true;  // Show plagiarism checking loader
+            this.isLoading = false;  // Hide loading students
 
             try {
                 const response = await axios.post('http://127.0.0.1:5000/api/ta/check_plagiarism', {
@@ -130,7 +143,6 @@ export default {
                 this.score = overall_score;
                 this.plagiarismResults = plagiarism_results;
                 console.log("Plagiarism results received:", response.data);
-
             } catch (error) {
                 console.error('Error checking plagiarism:', error);
                 if (error.response) {
@@ -141,7 +153,7 @@ export default {
                     alert('An unexpected error occurred.');
                 }
             } finally {
-                this.isLoading = false;  // Hide loader after plagiarism check completes
+                this.isPlagiarismChecking = false;  // Hide plagiarism checking loader
             }
         },
     },
@@ -173,7 +185,7 @@ export default {
 }
 
 .loader {
-    width: 28px;
+    width: 25px;
     aspect-ratio: 1;
     border-radius: 50%;
     background: #E3AAD6;
@@ -186,7 +198,7 @@ export default {
 .loader::after {
     content: "";
     grid-area: 1/1;
-    background: #F4DD51;
+    background: #e951f4;
     border-radius: 50%;
     transform-origin: top;
     animation: inherit;
@@ -194,7 +206,7 @@ export default {
 }
 
 .loader::after {
-    background: #F10C49;
+    background: #490cf1;
     --s: 180deg;
 }
 
