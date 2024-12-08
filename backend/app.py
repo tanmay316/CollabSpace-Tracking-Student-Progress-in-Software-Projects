@@ -51,13 +51,18 @@ jwt = JWTManager(app)
 
 celery_app = celery_init_app(app)
 
-from tasks import send_deadline_reminder
+from tasks import send_deadline_reminder, send_instructor_report
 def setup_periodic_tasks(sender, **kwargs):
 
     sender.add_periodic_task(
-        crontab(hour=18, minute=23),
+        crontab(hour=17, minute=30),
 
         send_deadline_reminder.s(),
+    )
+
+    sender.add_periodic_task(
+        crontab(hour=17, minute=32),
+        send_instructor_report.s(),
     )
 
 celery_app.on_after_configure.connect(setup_periodic_tasks)
