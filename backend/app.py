@@ -17,7 +17,6 @@ from routes.rag_routes import rag
 from routes.pdf_routes import pdf
 from routes.chat_routes import chat
 
-
 from celery_worker import celery_init_app
 from celery.result import AsyncResult
 # from tasks import send_deadline_reminder

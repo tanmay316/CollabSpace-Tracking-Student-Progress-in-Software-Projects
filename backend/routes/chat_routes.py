@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, Users, Conversations, Message
+from models import db, Users, Conversations, Messages
 
 chat = Blueprint("chat", __name__)
 
