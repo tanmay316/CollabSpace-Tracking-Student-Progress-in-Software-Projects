@@ -15,6 +15,8 @@ from routes.admin_routes import admin
 from routes.authentication import auth
 from routes.rag_routes import rag 
 from routes.pdf_routes import pdf
+from routes.chat_routes import chat
+
 
 from celery_worker import celery_init_app
 from celery.result import AsyncResult
