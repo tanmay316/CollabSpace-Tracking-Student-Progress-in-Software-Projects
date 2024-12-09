@@ -29,6 +29,10 @@ This project consists of a frontend built using **Vue 3** and a backend develope
 2. **Create a Virtual Environment**:
 
    ```bash
+   pip install virtualenv
+   ```
+   
+   ```bash
    python -m venv venv
    ```
 
@@ -71,7 +75,40 @@ This project consists of a frontend built using **Vue 3** and a backend develope
    The backend will be available at `http://127.0.0.1:5000`.
 
 ---
+### Redis-Server
 
+1. **Run Redis-Server on Docker:**
+
+   ```bash
+   docker run --name my-redis -p 6379:6379 -d redis
+   ```
+2. **Stop Redis-Server:**
+
+   ```bash
+   docker stop my-redis
+   ```
+
+---
+### MailHog SMTP
+
+1. **Install MailHog**
+   - **Mac/Linux**:
+   ```bash
+     brew install mailhog
+   ```
+
+2. **Run MailHog**
+   - **To start mailhog now and restart at login**:
+   ```bash
+   brew services start mailhog
+   ```
+
+   - **To start mailhog now**:
+   ```bash
+   /opt/homebrew/opt/mailhog/bin/MailHog -api-bind-addr 127.0.0.1:8025 -smtp-bind-addr 127.0.0.1:1025 -ui-bind-addr 127.0.0.1:8025
+   ```
+
+---
 ### Frontend
 
 1. **Navigate to the Frontend Directory**:
