@@ -218,11 +218,11 @@ def submit_milestone(milestone_id, student_id):
     }), 200
 
 
-@student.route("/get_submission/<int:milestone_id>", methods=["GET"])
+@student.route("/get_submission/<int:milestone_id>/<int:student_id>", methods=["GET"])
 # @role_required("student")
-def get_submission(milestone_id):
+def get_submission(milestone_id, student_id):
     # student_id = request.get_json().get("student_id")
-    student_id = 1
+    # student_id = 1
     submission = MilestoneSubmissions.query.filter_by(student_id=student_id, milestone_id=milestone_id).first()
     if not submission:
         return jsonify({
