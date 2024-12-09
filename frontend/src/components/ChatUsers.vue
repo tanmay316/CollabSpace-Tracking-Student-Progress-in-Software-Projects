@@ -7,7 +7,7 @@
         <img :src="user.image || 'https://via.placeholder.com/40'" alt="User Image" class="user-image" />
         <div class="user-info">
           <p class="user-name">{{ user.name }}</p>
-          <p class="user-last-msg">{{ user.lastMessage}}</p>
+          <p class="user-last-msg">{{ user.lastMessage || 'No messages yet' }}</p>
         </div>
       </li>
     </ul>
@@ -20,7 +20,8 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const users = ref([]);
-const currentUserId = 1; // Replace with actual logged-in user ID, ideally fetched from auth
+const userInfo = JSON.parse(localStorage.getItem('user_info'));
+const currentUserId = userInfo ? userInfo.user_id : null; 
 
 const router = useRouter();
 

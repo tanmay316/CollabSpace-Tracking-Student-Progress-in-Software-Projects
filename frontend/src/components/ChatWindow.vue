@@ -1,6 +1,6 @@
 <!-- src/components/ChatWindow.vue -->
 <template>
-  <div class="chat-window">
+  <div id="chat" class="chat-window">
     <!-- Chat Header -->
     <header class="chat-header">
       <div class="user-info">
@@ -38,6 +38,7 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted, watch, nextTick } from 'vue';
 import axios from 'axios';
@@ -51,7 +52,9 @@ const formatTimestamp = (timestamp) => {
 
 // Reactive references
 const route = useRoute();
-const senderId = 1; // Replace with the logged-in user's ID
+const users = ref([]);
+const userInfo = JSON.parse(localStorage.getItem('user_info'));
+const senderId = userInfo ? userInfo.user_id : null;  // Replace with the logged-in user's ID
 
 // Get receiverId from route params
 const receiverId = ref(route.params.id);
@@ -155,9 +158,11 @@ const scrollToBottom = () => {
 .chat-window {
   margin: 50px auto 0 auto;
   display: flex;
+  
   flex-direction: column;
   height: 92vh;
-  background: linear-gradient(135deg, #080808, #2a0231, #220e49);
+  
+  background: linear-gradient(135deg, #080808, #0a0a0a, #220e49);
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #ffffff;
 }
@@ -292,7 +297,7 @@ const scrollToBottom = () => {
 }
 
 .chat-input input:focus {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(246, 244, 244, 0.3);
 }
 
 .chat-input button {
