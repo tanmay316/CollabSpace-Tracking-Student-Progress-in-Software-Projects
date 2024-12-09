@@ -223,6 +223,12 @@
     align-items: center;
   }
 
+  input{
+    color: grey;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+    padding: 1px;
+  }
+
   p{
     color: #4b5563;
   }

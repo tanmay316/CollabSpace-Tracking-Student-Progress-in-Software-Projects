@@ -11,7 +11,7 @@
       <RouterLink v-if="isLoggedIn" to="/chatUsers" class="nav-item">Chat</RouterLink>
       <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
       <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
-      <RouterLink to="/students" class="nav-item">Students</RouterLink> <!-- New link -->
+      <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/students" class="nav-item">Students</RouterLink>
     </div>
 
     <input type="checkbox" class="menu" v-model="isNavbarOpen" />
@@ -56,7 +56,8 @@ const logout = async () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_info");
 
-    router.push("/");
+    // router.push("/");
+    window.location.href = '/';
   } catch (error) {
     console.error("Logout failed:", error.response || error.message);
     alert(error.response?.data?.message || "An error occurred while logging out.");

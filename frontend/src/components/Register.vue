@@ -85,6 +85,11 @@ const register = async () => {
 </script>
 
 <style>
+input{
+  color: gray;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
 .border{
     padding: 2rem;
     background-color: #fff;

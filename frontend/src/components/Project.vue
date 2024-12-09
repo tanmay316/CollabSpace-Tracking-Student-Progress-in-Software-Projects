@@ -32,7 +32,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <!-- <div class="project-card">
             <div class="card-header">
               <h3>
                 <RouterLink to="/mentorship">
@@ -45,7 +45,7 @@
                 <p>Get mentorship from industry experts to learn frameworks and libraries for this project and beyond!</p>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <div v-if="(role === 'student' && vivaSlots && vivaSlots.length > 0) || role === 'ta' || role === 'instructor'" class="project-card">
@@ -92,15 +92,14 @@
                         <div class="viva-icon" @click="deleteVivaSlot(slot.id)">❌</div>
                       </div>
 
-                      <div v-if="slot.status === 'available' && role === 'student'" class="slot-block1">
-                        <div
-                          class="slot"
-                          @click="bookVivaSlot(slot.id)"
-                        >
-                          {{ slot.slot_date }} {{ formatTime(slot.slot_time) }}
+                      <div v-if="role === 'student'" class="slot-block1">
+                        <div class="slot" @click="bookVivaSlot(slot.id)" v-if="slot.status === 'available'">
+                          {{ slot.slot_date }} {{ slot.slot_time }}
+                        </div>
+                        <div class="slot" v-else>
+                          {{ slot.slot_date }} {{ slot.slot_time }} ({{ slot.status }})
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>

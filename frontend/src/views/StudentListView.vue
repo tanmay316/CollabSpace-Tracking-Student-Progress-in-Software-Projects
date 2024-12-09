@@ -75,10 +75,11 @@
   
   <style scoped>
   .student-list {
+    padding: 0.5rem;
     font-family: 'Arial', sans-serif;
-    margin: 20px;
     color: #333;
     text-align: center;
+    margin-top: 2rem;
   }
   
   h1 {
