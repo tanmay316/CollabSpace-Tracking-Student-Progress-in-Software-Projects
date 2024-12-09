@@ -9,7 +9,7 @@
       <RouterLink v-if="!isLoggedIn" to="/register" class="nav-item">Register</RouterLink>
       <RouterLink v-if="isLoggedIn" to="/" class="nav-item" @click="logout">Logout</RouterLink>
       <RouterLink v-if="isLoggedIn" to="/chatUsers" class="nav-item">Chat</RouterLink>
-      <RouterLink v-if="role === 'instructor'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
+      <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
       <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
     </div>
 
@@ -21,6 +21,7 @@
 
 import { ref, onMounted } from 'vue';
 import { useRouter, RouterLink } from 'vue-router';
+import axios from "axios";
 
 const role = ref(null);
 const isLoggedIn = ref(false);
