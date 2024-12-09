@@ -103,7 +103,7 @@ def login():
 
 @auth.route("/logout", methods=["POST"])
 def logout():
-    print(request.headers)
+    # print(request.headers)
     response = jsonify({"message": "Logged out Successfully"})
     unset_jwt_cookies(response)
     return response, 200
