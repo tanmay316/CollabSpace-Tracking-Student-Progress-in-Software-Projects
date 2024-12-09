@@ -26,7 +26,7 @@
                   :key="milestone.id"
                   class="milestones"
                 >
-                  <span>{{ getMilestoneStatus(milestone.deadline) }}</span> {{ milestone.title }}
+                  <span v-if="role === 'student'">{{ getMilestoneStatus(milestone) }}</span> {{ milestone.title }}
                 </div>
               </div>
             </div>
@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <div class="project-card">
+        <div v-if="(role === 'student' && vivaSlots && vivaSlots.length > 0) || role === 'ta' || role === 'instructor'" class="project-card">
             <div class="card-header">
               <h3>
                 Viva Slots
@@ -58,13 +58,16 @@
             <div class="card-body">
               <div class="slots">
 
-                <div class="slot-container">
+                <div v-if="role === 'ta' || role === 'instructor'" class="slot-container">
                   <div class="slot-block2">
-                    <input class="viva-date-icon" type="date">
+                    <label for="slotDate">Slot Date:</label>
+                    <input id="slotDate" v-model="slotDate" type="date" class="input-field" />
                   </div>
-                  <div class="slot-block1">
-                    <div class="create-slot" @click="createVivaSlot()">+ Viva Slot</div>
+                  <div class="slot-block2">
+                    <label for="slotTime">Slot Time:</label>
+                    <input id="slotTime" v-model="slotTime" type="time" class="input-field" />
                   </div>
+                  <div @click="createVivaSlot" class="viva-icon">+ Create Viva Slot</div>
                 </div>
 
                 <div class="slot-container">
@@ -72,21 +75,34 @@
                   <div v-else-if="error">{{ error }}</div>
                   <div v-else>
                     <div v-for="slot in vivaSlots" :key="slot.id" class="slot-block">
-                      <div class="slot-block1">
-                        <div class="slot" @click="bookVivaSlot(slot.id)" v-if="slot.status === 'available'">
-                          {{ slot.slot_date }} {{ slot.slot_time }}
-                        </div>
-                        <div class="slot" v-else>
-                          {{ slot.slot_date }} {{ slot.slot_time }} ({{ slot.status }})
-                        </div>
+                      <div v-if="role === 'ta' || role === 'instructor'" class="slot-block2">
+                        <input
+                          v-model="slot.slot_date"
+                          class="viva-date-icon"
+                          type="date"
+                          :placeholder="slot.slot_date"
+                        />
+                        <input
+                          v-model="slot.slot_time"
+                          class="viva-time-icon"
+                          type="time"
+                          :placeholder="slot.slot_time"
+                        />
+                        <div v-if="slot.status === 'available'" class="viva-icon" @click="updateVivaSlot(slot)">✏️</div>
                         <div class="viva-icon" @click="deleteVivaSlot(slot.id)">❌</div>
                       </div>
-                      <div class="slot-block2">
-                        <input class="viva-date-icon" type="date">
-                        <div class="viva-icon" @click="updateVivaSlot(slot)">✏️</div>
+
+                      <div v-if="slot.status === 'available' && role === 'student'" class="slot-block1">
+                        <div
+                          class="slot"
+                          @click="bookVivaSlot(slot.id)"
+                        >
+                          {{ slot.slot_date }} {{ formatTime(slot.slot_time) }}
+                        </div>
                       </div>
+
                     </div>
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,15 +113,48 @@
   </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+
+const formatTime = (time) => {
+  const [hours, minutes] = time.split(':');
+  const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+  const period = hours < 12 ? 'AM' : 'PM';
+  return `${formattedHours}:${minutes} ${period}`;
+};
+
+import { ref, onMounted } from "vue";
 import axios from "axios";
 
 const milestones = ref([]);
 
 const fetchMilestones = async () => {
   try {
-    const response = await axios.get("http://127.0.0.1:5000/api/student/milestones");
-    milestones.value = response.data.milestones;
+    const milestoneResponse = await axios.get("http://127.0.0.1:5000/api/student/milestones");
+    const milestoneData = milestoneResponse.data.milestones;
+
+    for (const milestone of milestoneData) {
+      try {
+        const submissionResponse = await axios.get(
+          `http://127.0.0.1:5000/api/student/get_submission/${milestone.id}`
+        );
+        const submissionDetails = submissionResponse.data.submission_details;
+
+        const currentDate = new Date();
+        const deadlineDate = new Date(milestone.deadline);
+
+        if (submissionDetails.github_branch_link) {
+          milestone.status = currentDate <= deadlineDate ? "🟢 " : "🔴 ";
+        } else {
+          milestone.status = currentDate <= deadlineDate ? "⚪️ " : "🔴 ";
+        }
+      } catch (error) {
+        const currentDate = new Date();
+        const deadlineDate = new Date(milestone.deadline);
+
+        milestone.status = currentDate > deadlineDate ? "🔴 " : "⚪️ ";
+      }
+    }
+
+    milestones.value = milestoneData;
   } catch (err) {
     error.value = "Failed to load milestones.";
     console.error(err.response?.data || err.message);
@@ -114,22 +163,17 @@ const fetchMilestones = async () => {
   }
 };
 
-const getMilestoneStatus = (deadline) => {
-  const currentDate = new Date();
-  const deadlineDate = new Date(deadline);
-
-  if (currentDate < deadlineDate) {
-    return "⚪️";
-  } else if (currentDate.toDateString() === deadlineDate.toDateString()) {
-    return "🟢";
-  } else {
-    return "🔴";
-  }
+const getMilestoneStatus = (milestone) => {
+  return milestone.status || "⚪️ ";
 };
+
+fetchMilestones();
 
 const vivaSlots = ref([]);
 const loading = ref(false);
 const error = ref(null);
+
+const role = JSON.parse(localStorage.getItem("user_info"))?.role || "";
 
 const fetchVivaSlots = async () => {
   loading.value = true;
@@ -145,23 +189,29 @@ const fetchVivaSlots = async () => {
   }
 };
 
+const slotDate = ref('');
+const slotTime = ref('');
+
 const createVivaSlot = async () => {
   try {
-    const taId = prompt("Enter TA ID:");
-    const slotDate = prompt("Enter slot date (YYYY-MM-DD):");
-    const slotTime = prompt("Enter slot time (HH:MM:SS):");
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    const taId = userInfo.user_id;
 
-    if (!taId || !slotDate || !slotTime) {
+    if (!taId || !slotDate.value || !slotTime.value) {
       alert("All fields are required.");
       return;
     }
 
+    const formattedTime = `${slotTime.value}:00`;
+
     const response = await axios.post("http://127.0.0.1:5000/api/ta/api/viva_slots", {
       ta_id: taId,
-      slot_date: slotDate,
-      slot_time: slotTime,
+      slot_date: slotDate.value,
+      slot_time: formattedTime,
     });
-    alert(response.data.message);
+
+    slotDate.value = '';
+    slotTime.value = '';
     await fetchVivaSlots();
   } catch (err) {
     alert("Failed to create viva slot.");
@@ -171,15 +221,14 @@ const createVivaSlot = async () => {
 
 const updateVivaSlot = async (slot) => {
   try {
-    const slotDate = prompt("Enter new slot date (YYYY-MM-DD):", slot.slot_date);
-    const slotTime = prompt("Enter new slot time (HH:MM:SS):", slot.slot_time);
-    const status = prompt("Enter new status:", slot.status);
-
-    const response = await axios.post(`http://127.0.0.1:5000/api/ta/api/viva_slots/${slot.id}`, {
-      slot_date: slotDate,
-      slot_time: slotTime,
-      status: status,
-    });
+    const response = await axios.post(
+      `http://127.0.0.1:5000/api/ta/api/viva_slots/${slot.id}`,
+      {
+        slot_date: slot.slot_date,
+        slot_time: `${slot.slot_time}:00`,
+        status: slot.status,
+      }
+    );
     alert(response.data.message);
     await fetchVivaSlots();
   } catch (err) {
@@ -189,11 +238,8 @@ const updateVivaSlot = async (slot) => {
 };
 
 const deleteVivaSlot = async (slotId) => {
-  if (!confirm("Are you sure you want to delete this slot?")) return;
-
   try {
     const response = await axios.delete(`http://127.0.0.1:5000/api/ta/api/viva_slots/${slotId}`);
-    alert(response.data.message);
     await fetchVivaSlots();
   } catch (err) {
     alert("Failed to delete viva slot.");
@@ -206,9 +252,7 @@ const bookVivaSlot = async (slotId) => {
 
   try {
     const response = await axios.post(`http://127.0.0.1:5000/api/student/book_viva_slot/${slotId}`);
-    alert(response.data.message);
 
-    // Reload the viva slots after booking
     await fetchVivaSlots();
   } catch (err) {
     alert('Failed to book viva slot.');

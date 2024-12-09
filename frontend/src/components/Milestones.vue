@@ -25,10 +25,10 @@
         </div>
 
         <div class="grid">
-          <div 
-            v-for="milestone in milestones" 
-            :key="milestone.id" 
-            class="milestone-card" 
+          <div
+            v-for="milestone in milestones"
+            :key="milestone.id"
+            class="milestone-card"
             :class="{
               'completed': milestone.status === 'completed',
               'pending': milestone.status === 'pending',
@@ -43,31 +43,31 @@
               </h3>
 
               <div class="stats">
-                <span :class="statusClass(milestone.status)">
+                <span v-if="role === 'student'" :class="statusClass(milestone.status)">
                   {{ milestone.status }}
                 </span>
 
                 <div v-if="role === 'instructor'" class="mile-icon" @click="deleteMilestone(milestone.id)">❌</div>
-
               </div>
             </div>
-            <div class="card-body">
+            <div v-if="role === 'student'" class="card-body">
               <p>{{ milestone.description }}</p>
               <p color="cyan">{{ milestone.date_issued }}</p>
               <p color="pink">{{ milestone.deadline }}</p>
             </div>
+
             <div v-if="role === 'instructor'" class="edit-body">
               <div class="edits">
                 <p>Title:</p>
-                <input type="text" v-model="editedMilestone.title" />
+                <input type="text" v-model="milestone.title" />
                 <p>Description:</p>
-                <input type="text" v-model="editedMilestone.description" />
+                <input type="text" v-model="milestone.description" />
                 <p>Date Issued:</p>
-                <input type="date" v-model="editedMilestone.date_issued" />
+                <input type="date" v-model="milestone.date_issued" />
                 <p>Deadline:</p>
-                <input type="date" v-model="editedMilestone.deadline" />
+                <input type="date" v-model="milestone.deadline" />
               </div>
-              <div class="mile-icon" @click="updateMilestone(milestone.id)">✏️</div>
+              <div class="mile-icon" @click="updateMilestone(milestone.id, milestone)">✏️</div>
             </div>
           </div>
         </div>
@@ -93,7 +93,6 @@
       isLoggedIn.value = false;
     }
   });
-  // #########
 
   const milestone = ref({
     title: "",
@@ -103,9 +102,19 @@
   });
 
   const createMilestone = async () => {
+    const dateIssued = new Date(milestone.value.date_issued);
+    const deadline = new Date(milestone.value.deadline);
+
+    if (deadline < dateIssued) {
+      alert("Deadline cannot be before the date issued.");
+      return;
+    }
+
     try {
-      const response = await axios.post("http://127.0.0.1:5000/api/instructor/create_milestone", milestone.value);
-      alert(response.data.message);
+      const response = await axios.post(
+        "http://127.0.0.1:5000/api/instructor/create_milestone",
+        milestone.value
+      );
       milestone.value = {
         title: "",
         description: "",
@@ -125,19 +134,15 @@
     deadline: "",
   });
   
-  const updateMilestone = async (milestoneId) => {
+  const updateMilestone = async (milestoneId, milestone) => {
+    const editedMilestone = ref({ ...milestone });
     try {
       const response = await axios.post(
         `http://127.0.0.1:5000/api/instructor/update_milestone/${milestoneId}`,
         editedMilestone.value
       );
       alert(response.data.message);
-      editedMilestone.value = {
-        title: "",
-        description: "",
-        date_issued: "",
-        deadline: "",
-      };
+      Object.assign(milestone, editedMilestone.value);
     } catch (error) {
       console.error(error.response.data);
       alert(error.response.data.error);
@@ -145,31 +150,43 @@
   };
   
   const milestones = ref([]);
-  
+
   const fetchMilestones = async () => {
     try {
       const milestoneResponse = await axios.get("http://127.0.0.1:5000/api/student/milestones");
       const milestoneData = milestoneResponse.data.milestones;
-  
+
       for (const milestone of milestoneData) {
         try {
           const submissionResponse = await axios.get(
             `http://127.0.0.1:5000/api/student/get_submission/${milestone.id}`
           );
-          milestone.status = "completed";
+          const submissionDetails = submissionResponse.data.submission_details;
+
+          const currentDate = new Date();
+          const deadlineDate = new Date(milestone.deadline);
+
+          if (submissionDetails.github_branch_link) {
+            milestone.status = currentDate <= deadlineDate ? "completed" : "incomplete";
+          } else {
+            milestone.status = currentDate <= deadlineDate ? "pending" : "incomplete";
+          }
         } catch (error) {
           const currentDate = new Date();
           const deadlineDate = new Date(milestone.deadline);
+
           milestone.status = currentDate > deadlineDate ? "incomplete" : "pending";
         }
       }
+
       milestones.value = milestoneData;
     } catch (err) {
       console.error("Error fetching milestones:", err);
     }
   };
+
   fetchMilestones();
-  
+
   const statusClass = (status) => {
     switch (status) {
       case "completed":
@@ -184,14 +201,10 @@
   };
 
   const deleteMilestone = async (milestoneId) => {
-    const confirmation = confirm("Are you sure you want to delete this milestone?");
-    if (!confirmation) return;
-
     try {
       const response = await axios.delete(
         `http://127.0.0.1:5000/api/instructor/delete_milestone/${milestoneId}`
       );
-      alert(response.data.message);
 
       milestones.value = milestones.value.filter((m) => m.id !== milestoneId);
     } catch (error) {
