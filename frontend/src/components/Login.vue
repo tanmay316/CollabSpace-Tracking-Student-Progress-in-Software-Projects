@@ -48,8 +48,6 @@ const login = async () => {
       password: password.value,
     });
 
-    alert(response.data.message || 'Login successful!');
-
     // Save access token and user info to local storage
     const { access_token, admin_info } = response.data;
     localStorage.setItem('access_token', access_token);
@@ -58,7 +56,8 @@ const login = async () => {
     // Redirect based on user role
     const userRole = admin_info.role.toLowerCase();
     console.log(userRole)
-    router.push('/')
+    window.location.href = '/';
+    // router.push('/')
     // if (userRole === 'admin') {
     //   router.push('/admin/dashboard');
     // } else if (userRole === 'ta') {
@@ -77,6 +76,11 @@ const login = async () => {
 </script>
   
 <style>
+
+input{
+  color: gray;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
 
 .border{
     padding: 2rem;
@@ -114,6 +118,7 @@ button {
 }
 
 p{
+  color: gray;
   margin-top: 1rem;
 }
 </style>
