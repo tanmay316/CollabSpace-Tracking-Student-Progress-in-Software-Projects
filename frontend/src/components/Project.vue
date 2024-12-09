@@ -126,6 +126,7 @@ import axios from "axios";
 
 const milestones = ref([]);
 
+const studentID = JSON.parse(localStorage.getItem("user_info"))["user_id"];
 const fetchMilestones = async () => {
   try {
     const milestoneResponse = await axios.get("http://127.0.0.1:5000/api/student/milestones");
@@ -134,7 +135,7 @@ const fetchMilestones = async () => {
     for (const milestone of milestoneData) {
       try {
         const submissionResponse = await axios.get(
-          `http://127.0.0.1:5000/api/student/get_submission/${milestone.id}`
+          `http://127.0.0.1:5000/api/student/get_submission/${milestone.id}/${studentID}`
         );
         const submissionDetails = submissionResponse.data.submission_details;
 
