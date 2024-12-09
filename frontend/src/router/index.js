@@ -64,6 +64,17 @@ const router = createRouter({
       name: "admin-dashboard",
       component: () => import("../views/AdminPage.vue"),
     },
+    {
+      path: "/students",
+      name: "StudentList",
+      component: () => import("../views/StudentListView.vue"),
+    },
+    {
+      path: "/student-progress/:id",
+      name: "StudentProgress",
+      component: () => import("../views/StudentProgressView.vue"),
+      props: true,
+    },
     
     
   ],

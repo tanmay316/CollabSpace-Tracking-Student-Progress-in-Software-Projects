@@ -11,6 +11,7 @@
       <RouterLink v-if="isLoggedIn" to="/chatUsers" class="nav-item">Chat</RouterLink>
       <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
       <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
+      <RouterLink to="/students" class="nav-item">Students</RouterLink> <!-- New link -->
     </div>
 
     <input type="checkbox" class="menu" v-model="isNavbarOpen" />
