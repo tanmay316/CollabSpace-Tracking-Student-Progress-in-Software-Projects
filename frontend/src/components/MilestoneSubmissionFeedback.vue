@@ -16,11 +16,11 @@
             <!-- <p>{{ submission.description }}</p> -->
             
               <a v-bind:href="submission.github_branch_link">GitHub Link</a>
-              <div>Plagiarism Status: {{ submission.plagiarism_status }}</div>
-              <div>Plagiarism Score: {{ submission.plagiarism_score }}</div>
+              <div class="lines">Plagiarism Status: {{ submission.plagiarism_status }}</div>
+              <div class="lines">Plagiarism Score: {{ submission.plagiarism_score }}</div>
               <br>
   
-              <div v-if="submission.instructor_feedback">
+              <div class="lines" v-if="submission.instructor_feedback">
                 Feedback Given: {{ submission.instructor_feedback }}
               </div>
   
@@ -173,103 +173,21 @@ export default {
     }
   }
 }
-// import { ref } from 'vue';
-import axios from 'axios'; // Ensure axios is installed and imported
 
-
-// const userRole = JSON.parse(localStorage.getItem("user_info"))["role"];
-// const milestoneID = ""; // need to populate it to retrieve submission(s) for that milestone alone
-
-
-// const submissions = ref([
-//   {
-//     id: 1,
-//     title: 'CRUD Operations Implementation',
-//     description: 'Submission includes backend and frontend integration for CRUD.',
-//     submission_link: '',
-//     feedback: ''
-//   },
-//   {
-//     id: 2,
-//     title: 'UI Design Submission',
-//     description: 'Completed UI components for the dashboard.',
-//     submission_link: '',
-//     feedback: ''
-//   },
-//   {
-//     id: 3,
-//     title: 'Testing and Debugging',
-//     description: 'Includes test cases and debugging report.',
-//     submission_link: '',
-//     feedback: ''
-//   }
-// ]);
-
-// const sendSubmissionLink = async (submission) => {
-//   if (submission.submission_link.trim()) {
-//     try {
-//       const response = await axios.post(`/api/submit_milestone/${submission.id}`, {
-//         student_id: getStudentId(), // Replace with actual method to get student ID
-//         github_branch_link: submission.submission_link,
-//         feedback: submission.feedback || '' // Optionally send feedback if available
-//       });
-      
-//       if (response.data.message) {
-//         alert(`Submission link sent for "${submission.title}": ${submission.submission_link}`);
-//         submission.submission_link = ''; // Clear submission link field after sending
-//       }
-//     } catch (error) {
-//       console.error(error);
-//       alert('Failed to send submission link.');
-//     }
-//   } else {
-//     alert('Please enter a submission link before sending.');
-//   }
-// };
-
-// const sendFeedback = async (submission) => {
-//   if (submission.feedback.trim()) {
-//     try {
-//       const response = await axios.post(`/api/submit_milestone/${submission.id}`, {
-//         student_id: getStudentId(), // Replace with actual method to get student ID
-//         github_branch_link: submission.submission_link || '', // Optionally send submission link if available
-//         feedback: submission.feedback
-//       });
-      
-//       if (response.data.message) {
-//         alert(`Feedback sent for "${submission.title}": ${submission.feedback}`);
-//         submission.feedback = ''; // Clear feedback field after sending
-//       }
-//     } catch (error) {
-//       console.error(error);
-//       alert('Failed to send feedback.');
-//     }
-//   } else {
-//     alert('Please enter feedback before sending.');
-//   }
-// };
-
-// const getInitials = (title) => {
-//   return title
-//     .split(' ')
-//     .map((word) => word[0])
-//     .join('')
-//     .toUpperCase()
-//     .slice(0, 2);
-// };
-
-// // Placeholder function to get the current student's ID
-// const getStudentId = () => {
-//   // Implement actual logic to retrieve the logged-in student's ID
-//   return 1; // Example: return 1
-// };
+import axios from 'axios';
 </script>
 
 <style scoped>
+.lines{
+  color: #4b5563;
+}
+
 h3{
   color: black;
 }
 .submission-container {
+  margin: 0.5rem;
+  padding: 0.5rem;
   background-color: #f3f4f6;
 }
 

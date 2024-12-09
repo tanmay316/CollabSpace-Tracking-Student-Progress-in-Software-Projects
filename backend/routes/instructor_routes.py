@@ -127,9 +127,6 @@ def update_milestone(milestone_id):
     # Parse and validate dates
     if "date_issued" in data:
         date_issued = datetime.strptime(data["date_issued"], "%Y-%m-%d")
-        today = datetime.now().date()
-        if date_issued.date() < today:
-            return jsonify({"error": "date_issued cannot be yesterday or any earlier day"}), 400
         milestone.date_issued = date_issued
 
     if "deadline" in data:
