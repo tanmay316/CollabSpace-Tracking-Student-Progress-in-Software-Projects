@@ -11,7 +11,7 @@ def send_deadline_reminder():
     milestones = Milestones.query.filter(Milestones.deadline == reminder_date).all()
     
     for milestone in milestones:
-        users = Users.query.all()
+        users = Users.query.filter_by(role='student').all()
         for user in users:
             message = f"""
                 <html>
@@ -45,15 +45,16 @@ def send_deadline_reminder():
                     </body>
                 </html>
                 """
-            send_email(user.email, "Reminder: Your Book deadline is near", message)
+            send_email(user.email, "Reminder: Milestone deadline is near", message)
     
     return "Done!"
 
 @shared_task(ignore_result=True)
 def send_instructor_report():
     today = datetime.today().date()
+    yesterday = today - timedelta(days=1)
 
-    milestones = Milestones.query.filter(Milestones.deadline < today).all()
+    milestones = Milestones.query.filter(yesterday == Milestones.deadline).all()
 
     for milestone in milestones:
         submissions = MilestoneSubmissions.query.filter_by(milestone_id=milestone.id).all()
@@ -104,8 +105,7 @@ def send_instructor_report():
             </html>
         """
 
-        # Send the email to the instructor
-        instructor_email = "instructor@example.com"  # Replace with actual instructor email
+        instructor_email = "instructor@example.com" 
         send_email(instructor_email, f"Summary of Submissions: {milestone.title}", message)
 
     return "Instructor Emails Sent!"
