@@ -57,13 +57,13 @@ from tasks import send_deadline_reminder, send_instructor_report
 def setup_periodic_tasks(sender, **kwargs):
 
     sender.add_periodic_task(
-        crontab(hour=17, minute=30),
+        crontab(hour=18, minute=3),
 
         send_deadline_reminder.s(),
     )
 
     sender.add_periodic_task(
-        crontab(hour=17, minute=32),
+        crontab(hour=18, minute=4),
         send_instructor_report.s(),
     )
 

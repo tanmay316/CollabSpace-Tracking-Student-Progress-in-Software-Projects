@@ -24,7 +24,6 @@ def get_project_status(student_id):
 
     return jsonify(milestone_progress=status_data)
 
-
 @student.route("/link_github_repo", methods=["POST"])
 # @jwt_required()
 # @role_required("student")

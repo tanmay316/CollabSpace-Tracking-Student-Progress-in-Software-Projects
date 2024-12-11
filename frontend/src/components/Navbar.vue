@@ -10,7 +10,7 @@
       <RouterLink v-if="isLoggedIn" to="/" class="nav-item" @click="logout">Logout</RouterLink>
       <RouterLink v-if="isLoggedIn" to="/chatUsers" class="nav-item">Chat</RouterLink>
       <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/summaryai" class="nav-item">Summarizer</RouterLink>
-      <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="navbar-link">Plagiarism</RouterLink>
+      <RouterLink v-if="role === 'ta'" to="/plagiarism-check" class="nav-item">Plagiarism</RouterLink>
       <RouterLink v-if="role === 'instructor' || role === 'TA'" to="/students" class="nav-item">Students</RouterLink>
     </div>
 
