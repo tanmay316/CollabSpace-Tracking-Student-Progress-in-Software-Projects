@@ -122,6 +122,7 @@
         date_issued: "",
         deadline: "",
       };
+      window.location.href = '/api/student/milestones';
     } catch (error) {
       console.error(error.response.data);
       alert(error.response.data.errors || error.response.data.error);
