@@ -2,6 +2,7 @@
     <div class="container">
       <div class="header"><h2>Software Engineering Project</h2></div>
       <div class="content">
+        <GitHubRepoView v-if="role === 'student'"/>
         <div class="grid">
 
           <div class="project-card">
@@ -9,13 +10,6 @@
               <h3>
                 <RouterLink to="/milestones">Milestones</RouterLink>
               </h3>
-              <a
-                class="badge"
-                href="https://github.com/anigaut/soft-engg-project-sep-2024-se-sep-10"
-                target="_blank"
-                rel="noreferrer"
-                >GitHub</a
-              >
             </div>
             <div class="card-body">
               <div v-if="loading">Loading milestones...</div>
@@ -122,6 +116,7 @@ const formatTime = (time) => {
 
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import GitHubRepoView from "@/views/GitHubRepoView.vue";
 
 const milestones = ref([]);
 
