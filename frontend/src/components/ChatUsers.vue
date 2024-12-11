@@ -7,7 +7,7 @@
         <img :src="user.image || 'https://via.placeholder.com/40'" alt="User Image" class="user-image" />
         <div class="user-info">
           <p class="user-name">{{ user.name }}</p>
-          <p class="user-last-msg">{{ user.lastMessage || 'No messages yet' }}</p>
+          <p class="user-last-msg">{{ user.lastMessage  }}</p>
         </div>
       </li>
     </ul>
