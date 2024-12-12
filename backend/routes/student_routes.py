@@ -49,7 +49,7 @@ def link_github_repo():
         return jsonify({"error": str(e)}), 500
 
 
-@student.route("/update_github_repo", methods=["PUT"])
+@student.route("/update_github_repo", methods=["POST"])
 # @jwt_required()
 # @role_required("student")
 def update_github_repo():

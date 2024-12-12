@@ -38,8 +38,8 @@ export default {
   methods: {
     async fetchLink() {
       try {
-        const response = await axios.get("/get_github_repo", {
-          data: { student_id: 1 }, // Replace with dynamic student ID
+        const response = await axios.get("http://127.0.0.1:5000/api/student/get_github_repo", {
+          data: { student_id: JSON.parse(localStorage.getItem("user_info") || "{}").user_id, },
         });
         this.link = response.data.github_repo_link;
       } catch (error) {
@@ -54,9 +54,9 @@ export default {
     },
     async saveLink() {
       try {
-        const endpoint = this.link ? "/update_github_repo" : "/link_github_repo";
+        const endpoint = this.link ? "http://127.0.0.1:5000/api/student/update_github_repo" : "http://127.0.0.1:5000/api/student/link_github_repo";
         await axios.post(endpoint, {
-          student_id: 1, // Replace with dynamic student ID
+          student_id: JSON.parse(localStorage.getItem("user_info") || "{}").user_id,
           github_repo_link: this.newLink,
         });
         this.link = this.newLink;
@@ -67,8 +67,8 @@ export default {
     },
     async deleteLink() {
       try {
-        await axios.post("/delete_github_repo", {
-          student_id: 1, // Replace with dynamic student ID
+        await axios.post("http://127.0.0.1:5000/api/student/delete_github_repo", {
+          student_id: JSON.parse(localStorage.getItem("user_info") || "{}").user_id,
         });
         this.link = null;
       } catch (error) {
