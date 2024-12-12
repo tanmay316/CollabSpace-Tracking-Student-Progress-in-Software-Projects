@@ -107,9 +107,11 @@
 
 <script setup>
 
+import GitHubRepoView from '../views/GitHubRepoView.vue';
+
 const formatTime = (time) => {
   const [hours, minutes] = time.split(':');
-  const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+  const formattedHours = hours % 12 || 12;
   const period = hours < 12 ? 'AM' : 'PM';
   return `${formattedHours}:${minutes} ${period}`;
 };
