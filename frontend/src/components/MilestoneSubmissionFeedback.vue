@@ -58,7 +58,7 @@
         <div class="card-content">
           <h3>Milestone {{ milestoneID }} Submission</h3>
           <div v-if="studentSubmission.github_branch_link">
-            <a v-bind:href="studentSubmission.github_branch_link">Sumitted GitHub Branch Link</a>
+            <a v-bind:href="studentSubmission.github_branch_link">Submitted GitHub Branch Link</a>
           </div>
 
           <div v-if="studentSubmission.instructor_feedback">
@@ -136,7 +136,6 @@ export default {
     },
 
     enterEvaluation(submissionID, feedback, marks) {
-      // sends feedback and marks for a submission
       axios.post(
         `http://127.0.0.1:5000/api/instructor/add_feedback/${submissionID}`,
         {feedback: feedback, marks: marks}
@@ -150,7 +149,6 @@ export default {
     },
 
     makeSubmission(milestoneID, studentID, githubBranchLink) {
-      // milestone submission from student
       axios.post(
         `http://127.0.0.1:5000/api/student/submit_milestone/${milestoneID}/${studentID}`,
         {github_branch_link: this.submissionGitHubLink}
@@ -178,6 +176,14 @@ import axios from 'axios';
 </script>
 
 <style scoped>
+a{
+ color: cornflowerblue;
+}
+
+div{
+  color: cornflowerblue;
+}
+
 .lines{
   color: #4b5563;
 }

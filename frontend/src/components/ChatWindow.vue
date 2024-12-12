@@ -1,24 +1,15 @@
-<!-- src/components/ChatWindow.vue -->
 <template>
   <div id="chat" class="chat-window">
-    <!-- Chat Header -->
     <header class="chat-header">
       <div class="user-info">
-        <img class="user-avatar" :src="otherUser.avatarUrl || '/default-avatar.jpg'" alt="User Avatar" />
+        <RouterLink to="/chatUsers"><div class="icon"> く </div></RouterLink>
         <div class="user-details">
           <h3>{{ otherUser.name }}</h3>
           <span>{{ otherUser.role }}</span>
         </div>
       </div>
-      <!-- Optional: Add action buttons like settings or options here -->
-      <div class="header-actions">
-        <button class="action-button">
-          &#9881; <!-- Gear Icon as a placeholder -->
-        </button>
-      </div>
     </header>
 
-    <!-- Chat Messages -->
     <ul class="chat-messages">
       <li v-for="msg in messages" :key="msg.id" :class="['message', msg.isSent ? 'sent' : 'received']">
         <div class="message-bubble">
@@ -28,7 +19,6 @@
       </li>
     </ul>
 
-    <!-- Chat Input -->
     <div class="chat-input">
       <input v-model="newMessage" type="text" placeholder="Type your message..." @keyup.enter="sendMessage" />
       <button @click="sendMessage" :disabled="!newMessage.trim()">
@@ -44,29 +34,23 @@ import { ref, onMounted, watch, nextTick } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 
-// Helper function to format timestamps
 const formatTimestamp = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-// Reactive references
 const route = useRoute();
 const users = ref([]);
 const userInfo = JSON.parse(localStorage.getItem('user_info'));
-const senderId = userInfo ? userInfo.user_id : null;  // Replace with the logged-in user's ID
+const senderId = userInfo ? userInfo.user_id : null;
 
-// Get receiverId from route params
 const receiverId = ref(route.params.id);
 
-// Fetch other user details if needed
 const otherUser = ref({ name: 'Loading...', role: 'Loading...', avatarUrl: '' });
 
-// Fetch messages
 const messages = ref([]);
 const newMessage = ref('');
 
-// Function to fetch messages
 const fetchMessages = async () => {
   try {
     if (!senderId || !receiverId.value) {
@@ -84,7 +68,6 @@ const fetchMessages = async () => {
   }
 };
 
-// Function to fetch other user details
 const fetchOtherUser = async () => {
   try {
     const response = await axios.get('http://127.0.0.1:5000/api/chat/users', {
@@ -101,7 +84,6 @@ const fetchOtherUser = async () => {
   }
 };
 
-// Watch for route changes to update receiverId
 watch(
   () => route.params.id,
   (newId) => {
@@ -111,13 +93,11 @@ watch(
   }
 );
 
-// Initial fetch
 onMounted(() => {
   fetchMessages();
   fetchOtherUser();
 });
 
-// Function to send a message
 const sendMessage = async () => {
   if (newMessage.value.trim() === '') return;
   try {
@@ -135,7 +115,7 @@ const sendMessage = async () => {
         timestamp: new Date().toISOString(),
         isSent: true,
       });
-      newMessage.value = ''; // Clear the input field
+      newMessage.value = '';
       scrollToBottom();
     }
   } catch (error) {
@@ -143,7 +123,6 @@ const sendMessage = async () => {
   }
 };
 
-// Function to scroll to the latest message
 const scrollToBottom = () => {
   nextTick(() => {
     const container = document.querySelector('.chat-messages');
@@ -156,76 +135,55 @@ const scrollToBottom = () => {
 
 <style scoped>
 .chat-window {
-  margin: 50px auto 0 auto;
+  margin-top: 5rem;
+  max-width: 700px;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
-  
   flex-direction: column;
   height: 92vh;
-  
-  background: linear-gradient(135deg, #080808, #0a0a0a, #220e49);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #ffffff;
 }
 
-/* Chat Header */
 .chat-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.3);
-  /* Semi-transparent overlay for better readability */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.icon {
+  color: black;
+  border-radius: 50%;
+  padding: 0.5rem;
+  cursor: pointer;
 }
 
 .user-info {
   display: flex;
+  gap: 12px;
   align-items: center;
 }
 
-.user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 12px;
-  border: 2px solid #ffffff;
-}
-
 .user-details h3 {
+  font-size: 1.2rem;
+  color: #111827;
   margin: 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: #ffffff;
 }
 
 .user-details span {
-  font-size: 14px;
-  color: #dddddd;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 
-.header-actions .action-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #ffffff;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background 0.3s;
-}
-
-.header-actions .action-button:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-/* Chat Messages */
 .chat-messages {
   flex: 1;
-  padding: 16px;
   overflow-y: auto;
-  background: rgba(0, 0, 0, 0.1);
-  /* Light overlay for message readability */
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
 }
 
 .chat-messages li {
@@ -242,129 +200,98 @@ const scrollToBottom = () => {
 }
 
 .message-bubble {
-  max-width: 60%;
-  padding: 10px 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.2);
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 12px;
+  background-color: #e5e7eb;
   position: relative;
   font-size: 14px;
-  color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: #1f2937;
 }
 
 .chat-messages li.sent .message-bubble {
-  background: linear-gradient(45deg, #6228d7,#2ac7ee);
-  color: #010000;
+  background-color: #34d399;
+  color: #ffffff;
 }
 
 .chat-messages li.received .message-bubble {
-  background: linear-gradient(45deg, #f9ce34, #ee2a7b);
-  color: #020202;
+  background-color: #f3f4f6;
 }
 
 .message-bubble small {
   display: block;
-  font-size: 10px;
-  color: #0a0a0a;
+  font-size: 0.75rem;
+  color: #6b7280;
   margin-top: 4px;
   text-align: right;
 }
 
-/* Chat Input */
 .chat-input {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.3);
-  /* Semi-transparent overlay for consistency */
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  margin-top: 16px;
 }
 
 .chat-input input {
   flex: 1;
   padding: 10px 16px;
-  border: none;
-  border-radius: 24px;
-  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   outline: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  transition: background 0.3s;
+  font-size: 14px;
+  color: #374151;
 }
 
 .chat-input input::placeholder {
-  color: #cccccc;
-}
-
-.chat-input input:focus {
-  background: rgba(246, 244, 244, 0.3);
+  color: #9ca3af;
 }
 
 .chat-input button {
   margin-left: 12px;
   padding: 10px 20px;
-  background: linear-gradient(45deg, #ee2a7b, #6228d7);
+  background-color: #3b82f6;
   border: none;
-  border-radius: 24px;
+  border-radius: 8px;
   color: #ffffff;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
 }
 
 .chat-input button:hover {
-  background: linear-gradient(45deg, #6228d7, #ee2a7b);
-  transform: translateY(-2px);
+  background-color: #2563eb;
 }
 
-.chat-input button:disabled {
-  background: rgba(238, 42, 123, 0.6);
-  cursor: not-allowed;
-}
-
-/* Scrollbar Styling for WebKit Browsers */
+/* Scrollbar Styling for Chat Messages */
 .chat-messages::-webkit-scrollbar {
-  width: 8px;
-}
-
-.chat-messages::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(156, 163, 175, 0.7);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
-
-  .chat-header,
-  .chat-input {
-    padding: 12px;
-  }
-
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    margin-right: 8px;
+  .chat-header {
+    flex-wrap: wrap;
   }
 
   .user-details h3 {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   .user-details span {
-    font-size: 12px;
+    font-size: 0.8rem;
   }
 
   .message-bubble {
-    max-width: 80%;
     font-size: 13px;
   }
 
@@ -373,8 +300,7 @@ const scrollToBottom = () => {
   }
 
   .chat-input button {
-    padding: 8px 16px;
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 </style>
