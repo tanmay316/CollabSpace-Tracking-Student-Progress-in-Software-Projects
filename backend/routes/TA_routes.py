@@ -415,9 +415,9 @@ def check_plagiarism():
             print("Comparing code...")
             score = compare_code(new_repo_code, existing_repo_code)
             print(f"Similarity score: {score}")
-            status = "fail" if score >= 30 else "pass"
+            status = "fail" if score >= 80 else "pass"
 
-            # If any comparison fails (score >= 30), mark the overall status as "fail"
+            # If any comparison fails (score >= 80), mark the overall status as "fail"
             if status == "fail":
                 overall_status = "fail"
 
@@ -438,7 +438,7 @@ def check_plagiarism():
             }
         )
 
-        # **Update the submission with the plagiarism score and status**
+        
         submission.plagiarism_score = score
         submission.plagiarism_status = status
         print(
